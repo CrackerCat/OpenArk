@@ -21,32 +21,41 @@
 #include <Windows.h>
 #include <mutex>
 #include "ui_coderkit.h"
+#include "../common/ui-wrapper/ui-wrapper.h"
 
 namespace Ui {
 	class CoderKit;
 	class OpenArkWindow;
 }
 
-
 class OpenArk;
 
-class CoderKit : public QWidget {
+class CoderKit : public CommonMainTabObject {
 	Q_OBJECT
 public:
-	CoderKit(QWidget* parent);
+	CoderKit(QWidget* parent, int tabid);
 	~CoderKit();
 
 private slots:
+	void onTabChanged(int index);
 	void onCodeTextChanged();
 	void onCodeTextChanged(const QString &text);
 	void onWindowsErrorTextChanged(const QString &text);
 	void onMessageId();
+	void onAlgIndexChanged(int index);
+	void onAlgPlainChanged();
 
 private:
+	void InitAsmToolsView();
+
+	void UpdateAlgorithmText(bool crypt);
 	void UpdateEditCodeText(const std::wstring& data, QObject* ignored_obj);
+	QString NasmAsm(std::string data, int bits, const std::string &format);
+	QString NasmDisasm(const std::string &data, int bits);
 
 private:
 	Ui::CoderKit ui;
 	OpenArk* parent_;
 	std::mutex upt_mutex_;
+	int alg_idx_;
 };

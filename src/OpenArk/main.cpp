@@ -33,6 +33,23 @@ int OpenArkInit(int argc, char *argv[])
 			exit(0);
 		}
 	}
+
+	app = new QApplication(argc, argv);
+	app->setWindowIcon(QIcon(":/OpenArk/OpenArk.ico"));
+	app_tr = new QTranslator();
+
+	OpenArkConfig::Instance()->Init();
+	OpenArkLanguage::Instance()->ChangeLanguage(OpenArkConfig::Instance()->GetLang(CONF_GET));
+
+	return 0;
+}
+
+int OpenArkUninit(int argc, char *argv[])
+{
+	delete app_tr;
+	delete app;
+	app_tr = nullptr;
+	app = nullptr;
 	return 0;
 }
 
@@ -40,11 +57,12 @@ int main(int argc, char *argv[])
 {
 	OpenArkInit(argc, argv);
 
-	QApplication a(argc, argv);
-	a.setWindowIcon(QIcon(":/OpenArk/OpenArk.ico"));
+	auto w = new OpenArk;
+	w->show();
+	auto err = app->exec();
+	delete w;
 
-	OpenArk w;
-	w.show();
+	OpenArkUninit(argc, argv);
 
-	return a.exec();
+	return err;
 }

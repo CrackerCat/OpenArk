@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="driver\driver.cpp">
+      <Filter>driver</Filter>
+    </ClCompile>
+    <ClCompile Include="common\common.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="notify\notify.cpp">
+      <Filter>notify</Filter>
+    </ClCompile>
+    <ClCompile Include="driver-entry.cpp" />
+    <ClCompile Include="notify\notify-lib.cpp">
+      <Filter>notify</Filter>
+    </ClCompile>
+    <ClCompile Include="arkdrv-api\arkdrv-api.cpp">
+      <Filter>arkdrv-api</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\memory.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="wingui\ops-hotkey\ops-hotkey.cpp">
+      <Filter>wingui\ops-hotkey</Filter>
+    </ClCompile>
+    <ClCompile Include="wingui\ops-hotkey\utils\utils.cpp">
+      <Filter>wingui\ops-hotkey\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="notify">
+      <UniqueIdentifier>{4f91c10f-34b3-49a6-bec2-ae813a57adba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="driver">
+      <UniqueIdentifier>{0524cfde-14fa-471f-84f3-8226224d739b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{9ae18d72-5aa6-4324-bfb8-f072171e9d02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api">
+      <UniqueIdentifier>{d8bf34f2-ae20-4728-bd7f-b28c2ac54789}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{8842c31c-3e11-4d24-a5d1-b85db5f4f9f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{c28bfcae-6bbe-4eee-a802-a10e966f708a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wingui">
+      <UniqueIdentifier>{c1698fd3-ea9a-40aa-a0b4-94d1a6f2ac53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wingui\ops-hotkey">
+      <UniqueIdentifier>{29d67cd2-6ecb-468d-a966-9ef786e9616c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wingui\ops-hotkey\utils">
+      <UniqueIdentifier>{09ee9ed7-a9de-4f95-8f43-811d97aa7892}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="driver\driver.h">
+      <Filter>driver</Filter>
+    </ClInclude>
+    <ClInclude Include="common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="notify\notify.h">
+      <Filter>notify</Filter>
+    </ClInclude>
+    <ClInclude Include="notify\notify-lib.h">
+      <Filter>notify</Filter>
+    </ClInclude>
+    <ClInclude Include="arkdrv-api\arkdrv-api.h">
+      <Filter>arkdrv-api</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>res</Filter>
+    </ClInclude>
+    <ClInclude Include="memory\memory.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="wingui\ops-hotkey\ops-hotkey.h">
+      <Filter>wingui\ops-hotkey</Filter>
+    </ClInclude>
+    <ClInclude Include="wingui\ops-hotkey\utils\utils.h">
+      <Filter>wingui\ops-hotkey\utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="OpenArkDrv.rc">
+      <Filter>res</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>

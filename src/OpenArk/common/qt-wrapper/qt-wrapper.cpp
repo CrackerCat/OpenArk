@@ -22,7 +22,7 @@ QSize OpenArkTabStyle::sizeFromContents(ContentsType type, const QStyleOption *o
 	if (type == QStyle::CT_TabBarTab) {
 		s.transpose();
 		s.rwidth() = 140;
-		s.rheight() = 40;
+		s.rheight() = 30;
 	}
 	return s;
 }
@@ -36,7 +36,11 @@ void OpenArkTabStyle::drawControl(ControlElement element, const QStyleOption *op
 				painter->save();
 				painter->setPen(0xb9b9b9);
 				painter->setBrush(QBrush(0xffffff));
-				painter->drawRect(rect.adjusted(0, 0, 0, 0));
+				if (tabopt->position != QStyleOptionTab::End) {
+					painter->drawRect(rect.adjusted(0, 0, 20, 0));
+				}	else {
+					painter->drawRect(rect.adjusted(0, 0, 20, -1));
+				}
 				painter->restore();
 				painter->save();
 				painter->setPen(0x00868b);
@@ -45,12 +49,15 @@ void OpenArkTabStyle::drawControl(ControlElement element, const QStyleOption *op
 				painter->setFont(QFont("", 11, QFont::Bold));
 				painter->drawText(rect, tabopt->text, option);
 				painter->restore();
-			}
-			else {
+			} else {
 				painter->save();
 				painter->setPen(0xb9b9b9);
 				painter->setBrush(QBrush(0xf0f0f0));
-				painter->drawRect(rect.adjusted(0, 0, 0, 0));
+				if (tabopt->position != QStyleOptionTab::End) {
+					painter->drawRect(rect.adjusted(0, 0, 20, 0));
+				}	else {
+					painter->drawRect(rect.adjusted(0, 0, 20, -1));
+				}
 				painter->restore();
 				painter->save();
 				QTextOption option;
@@ -64,6 +71,41 @@ void OpenArkTabStyle::drawControl(ControlElement element, const QStyleOption *op
 	}
 	else if (element == CE_TabBarTab) {
 		QProxyStyle::drawControl(element, option, painter, widget);
+	}
+}
+
+OpenArkLanguage* OpenArkLanguage::langobj_ = nullptr;
+OpenArkLanguage* OpenArkLanguage::Instance()
+{
+	if (langobj_) return langobj_;
+	langobj_ = new OpenArkLanguage;
+	return langobj_;
+}
+void OpenArkLanguage::ChangeLanguage(int lang)
+{
+	curlang_ = lang;
+	switch (lang) {
+	case -1:
+		if (QLocale::system().language() == QLocale::Chinese) {
+			return ChangeLanguage(1);
+		} else {
+			return ChangeLanguage(0);
+		}
+		break;
+	case 0:
+		if (app_tr) {
+			app->removeTranslator(app_tr);
+			//emit languageChaned();
+		}
+		break;
+	case 1:
+		if (app_tr) {
+			app_tr->load(":/OpenArk/lang/openark_zh.qm");
+			app->installTranslator(app_tr);
+			//emit languageChaned();
+		}
+	default:
+		break;
 	}
 }
 
@@ -109,10 +151,27 @@ int GetCurViewRow(QAbstractItemView *view)
 	return view->currentIndex().row();
 }
 
+int GetCurViewColumn(QAbstractItemView *view)
+{
+	return view->currentIndex().column();
+}
+
+QModelIndex GetCurItemView(QAbstractItemView *view, int column)
+{
+	auto idx = view->currentIndex();
+	return idx.sibling(idx.row(), column);
+}
+
 QString GetCurItemViewData(QAbstractItemView *view, int column)
 {
 	auto idx = view->currentIndex();
 	return idx.sibling(idx.row(), column).data().toString();
+}
+
+void SetCurItemViewData(QAbstractItemView *view, int column, QString val)
+{
+	auto idx = view->currentIndex();
+	view->model()->setData(idx.sibling(idx.row(), column), val);
 }
 
 void ExpandTreeView(const QModelIndex& index, QTreeView* view)
@@ -151,7 +210,7 @@ void SetDefaultTableViewStyle(QTableView* view, QStandardItemModel* model)
 	view->horizontalHeader()->setMinimumSectionSize(100);
 	view->verticalHeader()->setDefaultSectionSize(25);
 	view->selectionModel()->selectedIndexes();
-};
+}
 
 void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model)
 {
@@ -160,7 +219,19 @@ void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model)
 	//view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	view->header()->setMinimumSectionSize(100);
 	view->setSortingEnabled(true);
-};
+}
+
+void SetLineBgColor(QStandardItemModel *model, int row, const QBrush &abrush)
+{
+	for (int i = 0; i < model->columnCount(); i++) {
+		model->item(row, i)->setBackground(abrush);
+	}
+}
+
+void SetLineHidden(QTreeView *view, int row, bool hide)
+{
+	view->setRowHidden(row, view->rootIndex(), hide);
+}
 
 bool JsonParse(const QByteArray &data, QJsonObject &obj)
 {
@@ -198,9 +269,14 @@ bool JsonGetValue(const QByteArray &data, const QString &key, QJsonValue &val)
 	return JsonGetValue(obj, key, val);
 }
 
-void OpenBrowserUrl(QString url)
+void ShellOpenUrl(QString url)
 {
 	ShellExecuteW(NULL, L"open", url.toStdWString().c_str(), NULL, NULL, SW_SHOW);
+}
+
+void ShellRun(QString cmdline, QString param)
+{
+	ShellExecuteW(NULL, L"open", cmdline.toStdWString().c_str(), param.toStdWString().c_str(), NULL, SW_SHOW);
 }
 
 QString PidFormat(DWORD pid)

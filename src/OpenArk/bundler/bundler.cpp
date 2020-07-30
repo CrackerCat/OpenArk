@@ -9,6 +9,8 @@ Bundler::Bundler(QWidget *parent) :
 	parent_((OpenArk*)parent)
 {
 	ui.setupUi(this);
+	connect(OpenArkLanguage::Instance(), &OpenArkLanguage::languageChaned, this, [this]() {ui.retranslateUi(this); });
+
 	ui.folderLabel->installEventFilter(this);
 	ui.folderLabel->setCursor(Qt::PointingHandCursor);
 	setAcceptDrops(true);
@@ -20,7 +22,7 @@ Bundler::Bundler(QWidget *parent) :
 	files_model_->setHorizontalHeaderLabels(QStringList() << tr("Name") << tr("Size(KB)") << tr("Path"));
 
 	files_menu_ = new QMenu();
-	files_menu_->addAction(WCharsToQ(L"Use this ICON"), this, SLOT(onUseIcon()));
+	files_menu_->addAction(tr("Use the ICON"), this, SLOT(onUseIcon()));
 
 	connect(ui.openBtn, SIGNAL(clicked()), this, SLOT(onOpenFolder()));
 	connect(ui.selectIconBtn, SIGNAL(clicked()), this, SLOT(onSelectIcon()));
@@ -35,7 +37,7 @@ bool Bundler::eventFilter(QObject *obj, QEvent *e)
 {
 	if (obj == ui.folderLabel) {
 		if (e->type() == QEvent::MouseButtonPress) {
-			ShellExecuteA(NULL, "open", files_folder_.toStdString().c_str(), NULL, NULL, SW_SHOW);
+			ShellExecuteW(NULL, L"open", files_folder_.toStdWString().c_str(), NULL, NULL, SW_SHOW);
 		}
 	}	else if (obj == ui.filesView->viewport()) {
 		if (e->type() == QEvent::ContextMenu) {
@@ -53,10 +55,6 @@ void Bundler::dragEnterEvent(QDragEnterEvent *event)
 {
 	if (event->mimeData()->hasFormat("text/uri-list"))
 		event->acceptProposedAction();
-}
-
-void Bundler::dragMoveEvent(QDragMoveEvent *event)
-{
 }
 
 void Bundler::dropEvent(QDropEvent *event)
@@ -83,7 +81,7 @@ void Bundler::onOpenFolder()
 
 void Bundler::onSelectIcon()
 {
-	QString file = QFileDialog::getOpenFileName(this, tr("Select ICON"), "", tr("ico/exe (*.*)"));
+	QString file = QFileDialog::getOpenFileName(this, tr("Select ICON"), "", tr("ico/exe (*.exe;*.ico)"));
 	if (file.isEmpty()) return;
 	SelectIconImpl(file);
 }
@@ -100,12 +98,6 @@ void Bundler::onSaveTo()
 {
 	QString bundle = QFileDialog::getSaveFileName(this,tr("Save to"),"",tr("BundleFile(*.exe)"));
 	if (bundle.isEmpty()) return;
-
-	int rows = files_model_->rowCount();
-	if (rows == 0) {
-		MsgBoxError(tr("Files is empty"));
-		return;
-	}
 	
 	std::vector<std::wstring> files;
 	std::vector<std::wstring> names;
@@ -167,14 +159,12 @@ void Bundler::OpenFolderImpl(QString folder)
 	files_folder_ = folder;
 	ui.folderLabel->setText(folder);
 	ClearItemModelData(files_model_);
-	UNONE::FileCallbackW fcb = [&](wchar_t* path, wchar_t* name, void* param)->bool {
+	UNONE::DirEnumCallbackW fcb = [&](wchar_t* path, wchar_t* name, void* param)->bool {
 		if (UNONE::FsIsDirW(path)) {
 			UNONE::FsEnumDirectoryW(path, fcb, param);;
 			return true;
 		}
-		QStandardItem* item;
-		int count = files_model_->rowCount();
-		int row = 0;
+		InitTableItem(files_model_);
 		AppendTableIconItem(files_model_, LoadIcon(WCharsToQ(path)), WCharsToQ(name));
 		DWORD64 size;
 		UNONE::FsGetFileSizeW(path, size);

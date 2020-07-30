@@ -23,7 +23,8 @@
 
 struct ProcInfo {
 	DWORD pid;
-	DWORD ppid;
+	DWORD ppid = -1;
+	DWORD parent_existed = -1;
 	QString name;
 	QString desc;
 	QString corp;
@@ -36,3 +37,10 @@ void CacheRefreshProcInfo();
 
 UNONE::PROCESS_BASE_INFOW CacheGetProcessBaseInfo(DWORD pid);
 
+struct FileBaseInfo {
+	QString path;
+	QString desc;
+	QString ver;
+	QString corp;
+};
+FileBaseInfo CacheGetFileBaseInfo(QString path);

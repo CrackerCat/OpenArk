@@ -16,6 +16,7 @@
 #pragma once
 #include <QtWidgets/QMainWindow>
 #include "ui_openark.h"
+#include "common/config/config.h"
 
 class Cmds;
 
@@ -29,6 +30,7 @@ protected:
 
 signals:
 	void signalRefresh();
+	void signalShowPtool(int);
 
 public slots:
 	void onLogOutput(QString log);
@@ -41,23 +43,28 @@ private slots:
 	void onActionReset(bool checked);
 	void onActionOnTop(bool checked);
 	void onActionAbout(bool checked);
+	void onActionSettings(bool checked);
 	void onActionConsole(bool checked);
+	void onActionPtool(bool checked);
+	void onActionManuals(bool checked);
 	void onActionGithub(bool checked);
 	void onActionCoderKit(bool checked);
 	void onActionScanner(bool checked);
 	void onActionBundler(bool checked);
 	void onActionCheckUpdate(bool checked);
+	void onActionLanguage(QAction *act);
 	void onCmdHelp();
 	void onShowConsoleMenu(const QPoint &pt);
 	void onConsoleClear();
 	void onConsoleHelps();
+	void onConsoleHistory();
 	void onCmdInput();
-	void onTabChanged();
+	void onTabChanged(int);
 
 public:
 	void StatusBarClear();
 	void StatusBarAdd(QWidget *label);
-	void ActivateTab(int idx);
+	void SetActiveTab(int idx);
 
 private:
 	Cmds *cmds_;

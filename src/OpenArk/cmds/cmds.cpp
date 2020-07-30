@@ -15,6 +15,7 @@
 ****************************************************************************/
 #include "cmds.h"
 #include "constants/constants.h"
+#include "../common/utils/disassembly/disassembly.h"
 #include <time.h>	
 
 struct CommandHelpItem {
@@ -29,7 +30,9 @@ LR"(.help [show commands help and examples]
 
 { L".cls", "CmdCls", LR"(clear console screen)", L"" },
 
-{ L".history", "CmdHistory", LR"(show commands history)" , L"" },
+{ L".history", "CmdHistory", LR"(show commands history)" ,
+LR"(.history [show commands history]
+.history ps [show commands history matched *ps*])" },
 
 { L".exit", "CmdExit", LR"(exit current process)" , L"" },
 
@@ -67,6 +70,9 @@ LR"(.ps [show processes list]
 .ps -pid 1234,0n2048,0x3200 [find process pid=1234/0n2048/0x3200, default is decimal]
 .ps -path \windows [find process path matched *\windows*]
 .ps -mods 1234 [show module list that process pid=0n1234, default is decimal]
+.ps -rst -name chrome [restart process name matched *chrome* , be careful!!!]
+.ps -rst -pid 1234,0n2048,0x3200 [restart process pid=1234/0n2048/0x3200, default is decimal]
+.ps -rst -path \temp\ [restart process path matched *\temp\* , be careful!!!]
 .ps -kill -name chrome [kill process name matched *chrome* , be careful!!!]
 .ps -kill -pid 1234,0n2048,0x3200 [kill process pid=1234/0n2048/0x3200, default is decimal]
 .ps -kill -path \temp\ [kill process path matched *\temp\* , be careful!!!]
@@ -76,9 +82,17 @@ LR"(.ps [show processes list]
 LR"(.pstree [show process tree]
 .pstree 1234/0x3200 [show process tree parent id = 1234 or 0x3200])" },
 
-{ L".mm", "CmdMemoryInfo", LR"(show memory information)",
+{ L".mm", "CmdMemoryEditor", LR"(memory editor)",
 LR"(.mm [show os memory]
-.mm -pid 1234 [show process pid=1234 memory information])" },
+.mm i 1234 [show process pid=1234 memory information]
+.mm r 1234 40000 100 [read process(pid=1234) memory, 0x40000:0x100]
+.mm w 1234 40000 cccc9090 [write process(pid=1234) memory, 0x40000=>0xcc 0xcc 0x90 0x90)" },
+
+{ L".fs", "CmdFileEditor", LR"(file editor)",
+LR"(.fs [edit file data]
+.fs i c:\my.txt [show my.txt information]
+.fs r c:\my.txt 0 100/all [read my.txt, 0:0x100/all]
+.fs w c:\my.txt 0 cccc9090 [write my.txt, 0x0=>0xcc 0xcc 0x90 0x90)" },
 };
 
 Cmds::Cmds(QTextBrowser *parent) :
@@ -93,13 +107,31 @@ Cmds::Cmds(QTextBrowser *parent) :
 		else	
 			item.example.append(tail);
 	}
+
+	auto path = OpenArkConfig::Instance()->GetConsole("History.FilePath").toStdWString();
+	std::string history;
+	std::vector<std::string> vec;
+	UNONE::FsReadFileDataW(path, history);
+	UNONE::StrSplitA(history, "\r\n", vec);
+	for (auto &h : vec) {
+		if (!h.empty())
+			cmd_history_.push_back(StrToQ(h));
+	}
 }
 
 Cmds::~Cmds()
 {
+	UNONE::InterUnregisterLogger();
+	std::string history;
+	for (auto &h : cmd_history_) {
+		history.append(h.toStdString());
+		history.append("\r\n");
+	}
+	auto path = OpenArkConfig::Instance()->GetConsole("History.FilePath").toStdWString();
+	UNONE::FsWriteFileDataW(path, history);
 }
 
-Q_INVOKABLE void Cmds::CmdHelp(QStringList argv)
+Q_INVOKABLE void Cmds::CmdHelp(QString cmd, QStringList argv)
 {
 #define SHOW_HELP() \
 	if (!item.example.empty()) CmdOutput(L"%s - %s\n%s", item.cmd.c_str(), item.doc.c_str(), item.example.c_str()); \
@@ -120,33 +152,36 @@ Q_INVOKABLE void Cmds::CmdHelp(QStringList argv)
 	}
 }
 
-Q_INVOKABLE void Cmds::CmdCls(QStringList argv)
+Q_INVOKABLE void Cmds::CmdCls(QString cmd, QStringList argv)
 {
 	cmd_window_->clear();
 }
 
-Q_INVOKABLE void Cmds::CmdCmd(QStringList argv)
+Q_INVOKABLE void Cmds::CmdCmd(QString cmd, QStringList argv)
 {
 	std::wstring line;
+	if (argv.size() == 1)
+		line = VariantFilePath(line);
 	for (size_t i = 0; i < argv.size(); i++) {
 		line.append(argv[i].toStdWString());
 		if (i != (argv.size()-1))
 			line.append(L" ");
 	}
-	auto cmd = L"cmd.exe /c " + line;
-	std::string out;
+	auto &&cmdline = L"cmd.exe /c " + line;
+	std::wstring out;
 	DWORD code;
-	ReadConsoleOutput(UNONE::StrToA(cmd), out, code);
-	out = UNONE::StrTrimA(out);
-	UNONE::StrReplaceA(out, "\r");
+	ReadStdout(cmdline, out, code);
+	out = UNONE::StrTrimW(out);
+	UNONE::StrReplaceW(out, L"\r");
 	//UNONE::StrReplaceA(out, "\n", "</br>");
-	std::wstring xxx = UNONE::StrToW(out);
-	CmdOutput(L"%s", xxx.c_str());
+	CmdOutput(L"%s", out.c_str());
 }
 
-Q_INVOKABLE void Cmds::CmdStart(QStringList argv)
+Q_INVOKABLE void Cmds::CmdStart(QString cmd, QStringList argv)
 {
 	std::wstring line;
+	if (argv.size() == 1)
+		line = VariantFilePath(line);
 	for (size_t i = 0; i < argv.size(); i++) {
 		line.append(argv[i].toStdWString());
 		if (i != (argv.size() - 1))
@@ -155,7 +190,7 @@ Q_INVOKABLE void Cmds::CmdStart(QStringList argv)
 	UNONE::PsCreateProcessW(line);
 }
 
-Q_INVOKABLE void Cmds::CmdMsg(QStringList argv)
+Q_INVOKABLE void Cmds::CmdMsg(QString cmd, QStringList argv)
 {
 	if (MessageMapTable.empty()) {
 		std::vector<std::string> msgs;
@@ -197,10 +232,10 @@ Q_INVOKABLE void Cmds::CmdMsg(QStringList argv)
 		}
 	}
 
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdWndInfo(QStringList argv)
+Q_INVOKABLE void Cmds::CmdWndInfo(QString cmd, QStringList argv)
 {
 	auto OutputWndInfo = [&](HWND w) {
 		DWORD pid, tid;
@@ -249,23 +284,26 @@ Q_INVOKABLE void Cmds::CmdWndInfo(QStringList argv)
 			return;
 		}
 	}
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdHistory(QStringList argv)
+Q_INVOKABLE void Cmds::CmdHistory(QString cmd, QStringList argv)
 {
+	std::wstring pattern;
+	auto argc = argv.size();
+	if (argc == 1) {pattern = argv[0].toStdWString();}
 	int i = 0;
-	for (auto& m : cmd_history_) {
-		QString line = QString("%1 %2").arg(i).arg(m);
-		if (i == cmd_cursor_) {
-			line.insert(0, "* ");
+	for (auto &m : cmd_history_) {
+		if (UNONE::StrContainIW(m.toStdWString(), pattern)) {
+			QString line = QString("%1 %2").arg(i).arg(m);
+			if (i == cmd_cursor_) line.insert(0, "* ");
+			CmdOutput(line.toStdWString().c_str());
 		}
-		CmdOutput(line.toStdWString().c_str());
 		i++;
 	}
 }
 
-Q_INVOKABLE void Cmds::CmdTimeStamp(QStringList argv)
+Q_INVOKABLE void Cmds::CmdTimeStamp(QString cmd, QStringList argv)
 {
 	auto paramcnt = argv.size();
 	if (paramcnt == 0) {
@@ -276,17 +314,18 @@ Q_INVOKABLE void Cmds::CmdTimeStamp(QStringList argv)
 		CmdOutput("%s", UNONE::TmFormatUnixTimeA(VariantInt(argv[0].toStdString(), 10), "Y-M-D H:W:S").c_str());
 		return;
 	}
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdErrorShow(QStringList argv)
+Q_INVOKABLE void Cmds::CmdErrorShow(QString cmd, QStringList argv)
 {
-	auto OutErrorMsg = [&](DWORD err) {
+	auto OutErrorMsg = [&](DWORD err, DWORD status = -1) {
 		auto msg = UNONE::OsDosErrorMsgW(err);
 		if (msg.empty()) {
 			CmdOutput(L"%d is invalid error value", err);
 		} else {
-			CmdOutput(L"%s", msg.c_str());
+			if (status != -1)	CmdOutput(L"%X: %s", status, msg.c_str());
+			else CmdOutput(L"%d: %s", err, msg.c_str());
 		}
 	};
 
@@ -299,14 +338,14 @@ Q_INVOKABLE void Cmds::CmdErrorShow(QStringList argv)
 	if (argc == 2) {
 		if (argv[0] == "-s") {
 			int64_t val = VariantInt64(argv[1].toStdString());
-			OutErrorMsg(UNONE::OsNtToDosError(val));
+			OutErrorMsg(UNONE::OsNtToDosError(val), val);
 			return;
 		}
 	}
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdFormats(QStringList argv)
+Q_INVOKABLE void Cmds::CmdFormats(QString cmd, QStringList argv)
 {
 	auto DecToBin = [](int64_t val)->std::string {
 		char bins[128] = { 0 };
@@ -328,21 +367,21 @@ Q_INVOKABLE void Cmds::CmdFormats(QStringList argv)
 		CmdOutput("STR: %s", str.c_str());
 		return;
 	}
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdExit(QStringList argv)
+Q_INVOKABLE void Cmds::CmdExit(QString cmd, QStringList argv)
 {
 	ExitProcess(0);
 }
 
-Q_INVOKABLE void Cmds::CmdRestart(QStringList argv)
+Q_INVOKABLE void Cmds::CmdRestart(QString cmd, QStringList argv)
 {
 	UNONE::PsCreateProcessW(UNONE::PsGetProcessPathW());
 	ExitProcess(0);
 }
 
-Q_INVOKABLE void Cmds::CmdProcessInfo(QStringList argv)
+Q_INVOKABLE void Cmds::CmdProcessInfo(QString cmd, QStringList argv)
 {
 	auto OuputProcessInfo = [&](std::vector<DWORD> pids) {
 		std::wstring out;
@@ -420,6 +459,20 @@ Q_INVOKABLE void Cmds::CmdProcessInfo(QStringList argv)
 		}
 	};
 
+	auto RestartPids = [&](std::vector<DWORD> &pids) {
+		for (auto pid : pids) {
+			auto name = UNONE::PsGetProcessNameW(pid);
+			auto path = UNONE::PsGetProcessPathW(pid);
+			bool killed = UNONE::PsKillProcess(pid);
+			if (killed) {
+				UNONE::PsCreateProcessW(path);
+				CmdOutput(L"[+] restart pid:%d name:%s path:%s ok", pid, name.c_str(), path.c_str());
+			} else {
+				CmdOutput(L"[-] kill pid:%d name:%s path:%s err", pid, name.c_str(), path.c_str());
+			}
+		}
+	};
+
 	auto argc = argv.size();
 
 	if (argc == 0) {
@@ -473,6 +526,25 @@ Q_INVOKABLE void Cmds::CmdProcessInfo(QStringList argv)
 				return;
 			}
 		}
+		if (argv[0] == "-rst") {
+			std::wstring wstr = argv[2].toStdWString();
+			std::vector<DWORD> pids;
+			if (argv[1] == "-name") {
+				FindPidsByName(wstr, pids);
+				RestartPids(pids);
+				return;
+			}
+			if (argv[1] == "-pid") {
+				ParsePids(wstr, pids);
+				RestartPids(pids);
+				return;
+			}
+			if (argv[1] == "-path") {
+				FindPidsByPath(wstr, pids);
+				RestartPids(pids);
+				return;
+			}
+		}
 		if (argv[0] == "-inject") {
 			DWORD pid = VariantInt(argv[1].toStdString(), 10);
 			auto path = argv[2].toStdWString();
@@ -488,15 +560,24 @@ Q_INVOKABLE void Cmds::CmdProcessInfo(QStringList argv)
 		}
 	}
 
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdProcessTree(QStringList argv)
+std::vector<DWORD> _PsGetChildPids(__in DWORD pid)
 {
-	UNONE::LogCallback routine;
-	bool regok = UNONE::InterCurrentLogger(routine);
-	if (regok) UNONE::InterRegisterLogger([&](const std::wstring &) {});
-	ON_SCOPE_EXIT([&] {if (regok) UNONE::InterUnregisterLogger();});
+	std::vector<DWORD> childs;
+	UNONE::PsEnumProcess([&](PROCESSENTRY32W &entry)->bool {
+		if (pid != 0 && pid == entry.th32ParentProcessID) {
+			childs.push_back(entry.th32ProcessID);
+		}
+		return true;
+	});
+	return childs;
+}
+
+Q_INVOKABLE void Cmds::CmdProcessTree(QString cmd, QStringList argv)
+{
+	DISABLE_RECOVER();
 
 	int level = 0;
 	std::wstring prefix;
@@ -512,7 +593,7 @@ Q_INVOKABLE void Cmds::CmdProcessTree(QStringList argv)
 		}
 		CmdOutput(L"%s%s(%d)", prefix.c_str(), name.c_str(), pid);
 		level++;
-		auto childs = UNONE::PsGetChildPids(pid);
+		auto childs = _PsGetChildPids(pid);
 		for (size_t i = 0; i < childs.size(); i++) {
 			OutputProcessTree(childs[i], (i == childs.size() - 1));
 		}
@@ -537,15 +618,15 @@ Q_INVOKABLE void Cmds::CmdProcessTree(QStringList argv)
 		return;
 	}
 
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
-Q_INVOKABLE void Cmds::CmdMemoryInfo(QStringList argv)
+Q_INVOKABLE void Cmds::CmdMemoryEditor(QString cmd, QStringList argv)
 {
 	SIZE_T PageSize;
 	auto OutMemoryInfoStyle1 = [&](wchar_t* name, SIZE_T size) {
 		double mb = (double)(size*PageSize) / 1024 / 1024;
-		double gb = (double)(size*PageSize) / 1024 / 1024 / 1024;
+		double gb = round((double)(size*PageSize) / 1024 / 1024 / 1024);
 		CmdOutput(L"%s : %0.2f GB (%0.2f MB)", name, gb, mb);
 	};
 	auto OutMemoryInfoStyle2 = [&](wchar_t* name, SIZE_T size) {
@@ -575,7 +656,7 @@ Q_INVOKABLE void Cmds::CmdMemoryInfo(QStringList argv)
 		return;
 	}
 	if (argc == 2) {
-		if (argv[0] == "-pid") {
+		if (argv[0] == "i") {
 			DWORD pid = VariantInt(argv[1].toStdString(), 10);
 			PROCESS_MEMORY_COUNTERS_EX mm_info;
 			if (!UNONE::MmGetProcessMemoryInfo(pid, mm_info))
@@ -596,8 +677,87 @@ Q_INVOKABLE void Cmds::CmdMemoryInfo(QStringList argv)
 			return;
 		}
 	}
+	if (argc == 4) {
+		DWORD pid = VariantInt(argv[1].toStdString(), 10);
+		if (argv[0] == "r") {
+			HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+			ON_SCOPE_EXIT([&phd] {if (phd) CloseHandle(phd); });
+			if (!phd) return ERR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+			DWORD64 addr = VariantInt64(argv[2].toStdString());
+			DWORD size = VariantInt(argv[3].toStdString());
+			std::string buf;
+			buf.resize(size);
+			SIZE_T readlen;
+			bool ret = ReadProcessMemory(phd, (LPCVOID)addr, (LPVOID)buf.data(), size, &readlen);
+			if (!ret && size != readlen) {
+				return ERR(L"ReadProcessMemory pid:%d err:%d, expect:%d readlen:%d", pid, GetLastError(), size, readlen);
+			}
+			auto &&hexdump = HexDumpMemory(addr, (char*)buf.data(), buf.size());
+			UNONE::StrReplaceA(hexdump, "<", "&lt;");
+			return CmdOutput("%s", hexdump.c_str());
+		}
+		if (argv[0] == "w") {
+			HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_WRITE, FALSE, pid);
+			ON_SCOPE_EXIT([&phd] {if (phd) CloseHandle(phd); });
+			if (!phd) return ERR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
+			DWORD64 addr = VariantInt64(argv[2].toStdString());
+			auto &&buf = argv[3].toStdString();
+			UNONE::StrReplaceA(buf, ".");
+			buf = UNONE::StrHexStrToStreamA(buf);
+			SIZE_T writelen;
+			bool ret = WriteProcessMemory(phd, (LPVOID)addr, (LPVOID)buf.data(), buf.size(), &writelen);
+			if (!ret && buf.size() != writelen) {
+				return ERR(L"WriteProcessMemory pid:%d err:%d, expect:%d readlen:%d", pid, GetLastError(), buf.size(), writelen);
+			}
+			return CmdOutput("WriteProcessMemory addr:%llx size:%d ok", addr, writelen);
+		}
+	}
 
-	CmdException(ECMD_PARAM_INVALID);
+	CmdException(cmd,ECMD_PARAM_INVALID);
+}
+
+Q_INVOKABLE void Cmds::CmdFileEditor(QString cmd, QStringList argv)
+{
+	auto argc = argv.size();
+	if (argc == 2) {
+		if (argv[0] == "i") {
+			DWORD64 size;
+			auto &&path = VariantFilePath(argv[1].toStdWString());
+			UNONE::FsGetFileSizeW(path, size);
+			CmdOutput(L"FilePath: %s", path.c_str());
+			CmdOutput(L"FileSize: %f MB, %f KB, %lld Bytes", (double)size / 1024/1024, (double)size/1024, size);
+			return;
+		}
+	}
+	if (argc == 4) {
+		if (argv[0] == "r") {
+			auto &&path = VariantFilePath(argv[1].toStdWString());
+			std::string buf;
+			DWORD64 offset  = 0;
+			if (argv[3] == "all") {
+				UNONE::FsReadFileDataW(path, buf);
+			} else {
+				offset = VariantInt64(argv[2].toStdString());
+				DWORD64 size = VariantInt(argv[3].toStdString());
+				ReadFileDataW(path, offset, size, buf);
+			}
+			auto &&hexdump = HexDumpMemory(offset, (char*)buf.data(), buf.size());
+			UNONE::StrReplaceA(hexdump, "<", "&lt;");
+			return CmdOutput("%s", hexdump.c_str());
+		}
+		if (argv[0] == "w") {
+			auto &&path = VariantFilePath(argv[1].toStdWString());
+			auto &&buf = argv[3].toStdString();
+			DWORD64 offset = VariantInt64(argv[2].toStdString());
+			UNONE::StrReplaceA(buf, ".");
+			buf = UNONE::StrHexStrToStreamA(buf);
+			if (WriteFileDataW(path, offset, buf)) {
+				CmdOutput("WriteFile offset:%llx size:%d ok", offset, buf.size());
+			}
+			return;
+		}
+	}
+	CmdException(cmd,ECMD_PARAM_INVALID);
 }
 
 QString Cmds::CmdGetLast()
@@ -620,11 +780,12 @@ QString Cmds::CmdGetNext()
 	return cmdline;
 }
 
-void Cmds::CmdException(int type)
+void Cmds::CmdException(QString cmd, int type)
 {
 	switch (type) {
 	case ECMD_PARAM_INVALID:
-		CmdErrorOutput(L"[-] Command parameters invalid. (.help to show help-doc)");
+		CmdErrorOutput(L"[-] Command parameters invalid.");
+		CmdHelp(".help", QStringList()<<cmd);
 		break;
 	case ECMD_NOSUCH_CMD:
 		CmdErrorOutput(L"[-] No such command. (.help to show help-doc)");
@@ -657,8 +818,6 @@ void Cmds::CmdOutput(const wchar_t* format, ...)
 	std::wstring &&wstr = UNONE::StrFormatVaListW(format, lst);
 	log = QString().fromStdWString(wstr);
 	va_end(lst);
-	log.append("\n");
-	log.replace("\n", "<br/>");
 	log.replace("ERROR", "<font color=red>ERROR</font>");
 	log.replace("err", "<font color=red>err</font>");
 	log.replace("failed", "<font color=red>failed</font>");
@@ -666,6 +825,9 @@ void Cmds::CmdOutput(const wchar_t* format, ...)
 	log.replace("warning", "<font color=red>warning</font>");
 	log.replace("WRAN", "<font color=red>WRAN</font>");
 	log.replace("FATAL", "<font color=red>FATAL</font>");
+	log = QString("<font color=#E0E2E4>%1</font>").arg(log);
+	log.append("\n");
+	log.replace("\n", "<br/>");
 	cmd_window_->append(log);
 }
 
@@ -676,9 +838,13 @@ void Cmds::CmdDispatcher(const std::wstring &cmdline)
 	std::wstring wstr = UNONE::StrTrimW(cmdline);
 	
 	//if (!cmd_window_->toPlainText().isEmpty()) CmdOutput(LR"(<hr>)");
-	CmdOutput(LR"(<b><font color="black">C:\>%s</font></b>)", cmdline.c_str());
+	CmdOutput(LR"(<b><font color=#8ccf34>C:\>%s</color></b>)", cmdline.c_str());
 
 	if (cmd_history_.empty() || QString::compare(WStrToQ(wstr), cmd_history_.back(), Qt::CaseInsensitive)!=0) {
+		auto cnt = OpenArkConfig::Instance()->GetConsole("History.MaxRecords").toInt();
+		if (cmd_history_.size() >= cnt) {
+			cmd_history_.pop_front();
+		}
 		cmd_history_.push_back(WStrToQ(wstr));
 	}
 	cmd_cursor_ = cmd_history_.size();
@@ -704,69 +870,9 @@ void Cmds::CmdDispatcher(const std::wstring &cmdline)
 			UNONE::InterRegisterLogger([&](const std::wstring &log) { 
 				CmdOutput(log.c_str());
 			});
-			QMetaObject::invokeMethod(this, item.func.c_str(), Qt::QueuedConnection, Q_ARG(QStringList, pramlst));
+			QMetaObject::invokeMethod(this, item.func.c_str(), Qt::QueuedConnection, Q_ARG(QString, WStrToQ(item.cmd)), Q_ARG(QStringList, pramlst));
 			return;
 		}
 	}
-	CmdException(ECMD_NOSUCH_CMD);
-}
-
-int Cmds::VariantInt(std::string val, int radix)
-{
-	if (val.empty()) {
-		return 0;
-	}
-	if (val.find("0n") == 0) {
-		UNONE::StrReplaceA(val, "0n");
-		return UNONE::StrToDecimalA(val);
-	}
-	if (val.find("0x") == 0 || val[val.size() - 1] == 'h') {
-		UNONE::StrReplaceA(val, "0x");
-		return UNONE::StrToHexA(val);
-	}
-	if (val.find("0t") == 0) {
-		UNONE::StrReplaceA(val, "0t");
-		return UNONE::StrToOctalA(val);
-	}
-	if (val.find("0y") == 0) {
-		UNONE::StrReplaceA(val, "0y");
-		return UNONE::StrToBinaryA(val);
-	}
-	switch (radix) {
-	case 2: return UNONE::StrToBinaryA(val);
-	case 8: return UNONE::StrToOctalA(val);
-	case 10: return UNONE::StrToDecimalA(val);
-	case 16: return UNONE::StrToHexA(val);
-	default: return UNONE::StrToHexA(val);
-	}
-}
-
-int64_t Cmds::VariantInt64(std::string val, int radix)
-{
-	if (val.empty()) {
-		return 0;
-	}
-	if (val.find("0n") == 0) {
-		UNONE::StrReplaceA(val, "0n");
-		return UNONE::StrToDecimal64A(val);
-	}
-	if (val.find("0x") == 0 || val[val.size() - 1] == 'h') {
-		UNONE::StrReplaceA(val, "0x");
-		return UNONE::StrToHex64A(val);
-	}
-	if (val.find("0t") == 0) {
-		UNONE::StrReplaceA(val, "0t");
-		return UNONE::StrToOctal64A(val);
-	}
-	if (val.find("0y") == 0) {
-		UNONE::StrReplaceA(val, "0y");
-		return UNONE::StrToBinary64A(val);
-	}
-	switch (radix) {
-	case 2: return UNONE::StrToBinary64A(val);
-	case 8: return UNONE::StrToOctal64A(val);
-	case 10: return UNONE::StrToDecimal64A(val);
-	case 16: return UNONE::StrToHex64A(val);
-	default: return UNONE::StrToHex64A(val);
-	}
+	CmdException(WStrToQ(cmd), ECMD_NOSUCH_CMD);
 }

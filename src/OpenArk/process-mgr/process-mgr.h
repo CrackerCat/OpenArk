@@ -32,10 +32,19 @@ class OpenArk;
 class ProcSortFilterProxyModel : public QSortFilterProxyModel {
 	Q_OBJECT
 public:
-	ProcSortFilterProxyModel(QWidget *parent);
-	~ProcSortFilterProxyModel();
+	ProcSortFilterProxyModel(QWidget *parent) {};
+	~ProcSortFilterProxyModel() {};
 protected:
-	bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
+	bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+};
+class ModSortFilterProxyModel : public QSortFilterProxyModel {
+	Q_OBJECT
+public:
+	ModSortFilterProxyModel(QWidget *parent) {};
+	~ModSortFilterProxyModel() {};
+	int bottom_idx_;
+protected:
+	bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 };
 
 class ProcessMgr : public QWidget {
@@ -61,6 +70,7 @@ private slots:
 	void onCopyActionTriggerd(QAction* action);
 	void onKillProcess();
 	void onKillProcessTree();
+	void onRestartProcess();
 	void onSuspendProcess();
 	void onInjectDll();
 	void onSelectPid();
@@ -70,15 +80,29 @@ private slots:
 	void onEnumThread();
 	void onEnumWindow();
 	void onSendtoScanner();
+	void onVerifySignature();
+	void onVerifyAllSignature();
 	void onShowProperties();
-	void onShowModules();
-	void onProcSectionClicked(int idx);
+	void onCloseHandle();
+	void onHideUnnamedHandles(bool checked);
+	void onHideMemoryItem(bool checked);
+	void onDumpMemory();
+	void onShowBottom(int idx);
+	void onShowProcess();
+	void onShowModule();
+	void onShowHandle();
+	void onShowMemory();
+	void onSectionClicked(int idx);
 	void onProcDoubleClicked(const QModelIndex &idx);
 	void onProcChanged(const QModelIndex &current, const QModelIndex &previous);
 
 private:
+	void InitProcessView();
+	void InitBottomCommon();
+	void InitModuleView();
+	void InitHandleView();
+	void InitMemoryView();
 	void ShowProperties(DWORD pid, int tab);
-
 	void ShowProcessList();
 	void ShowProcessTree();
 	void AppendProcessItem(QStandardItem *parent, QStandardItem *name_item, ProcInfo info, int seq);
@@ -89,24 +113,38 @@ private:
 	DWORD ProcCurPid();
 	QString ProcCurViewItemData(int column);
 	QString ProcViewItemData(int row, int column);
-	QString ModCurViewItemData(int column);
+	QString BottomCurViewItemData(int column);
 	QString ModViewItemData(int row, int column);
 
 private:
 	int proc_header_idx_;
+	int bottom_header_idx_;
+	int bottom_header_last_;
+	int bottom_idx_;
+	bool unnamed_checked_;
+	bool uncommed_checked_;
+	bool nonexec_checked_;
+	bool imaged_checked_;
+	DWORD cur_pid_;
 
 private:
 	Ui::ProcessMgr ui;
 	OpenArk *parent_;
-	QLabel *cpu_percent_lable_;
-	QLabel *mm_percent_lable_;
-	QLabel *cntproc_lable_;
-	QLabel *cntthread_lable_;
-	QLabel *cnthandle_lable_;
+	QLabel *cpu_percent_label_;
+	QLabel *mm_percent_label_;
+	QLabel *cntproc_label_;
+	QLabel *cntthread_label_;
+	QLabel *cnthandle_label_;
 	QMenu *proc_menu_;
 	QMenu *mod_menu_;
+	QMenu *hd_menu_;
+	QMenu *mem_menu_;
 	QTimer timer_;
+	QPoint proc_sel_;
 	QStandardItemModel *proc_model_;
-	QStandardItemModel *mod_model_;
-	ProcSortFilterProxyModel *proxy_model_;
+	QStandardItemModel *bottom_model_;
+	QStandardItemModel *hd_model_;
+	QStandardItemModel *mem_model_;
+	ProcSortFilterProxyModel *proxy_proc_;
+	ModSortFilterProxyModel *proxy_bottom_;
 };

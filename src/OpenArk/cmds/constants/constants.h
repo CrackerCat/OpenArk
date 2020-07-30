@@ -19,6 +19,11 @@
 #include <map>
 
 extern char *MessageRawString;
+extern std::map<int, std::string> ObjectTypeTable;
 extern std::map<int, std::string> MessageMapTable;
 
-bool ReadConsoleOutput(const std::string& Cmdline, std::string& Output, DWORD& ExitCode, DWORD Timeout);
+void InitObjectTypeTable();
+int GetObjectTypeIndex(char* name);
+std::string MbiTypeToString(int type);
+std::string MbiStateToString(int type);
+std::string MbiPageProtectToString(int type);

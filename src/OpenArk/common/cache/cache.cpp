@@ -21,6 +21,7 @@ static struct {
 	QMap<unsigned int, ProcInfo> d;
 } proc_info;
 
+
 ProcInfo CacheGetProcInfo(unsigned int pid, ProcInfo& info)
 {
 	QMutexLocker locker(&proc_info.lck);
@@ -32,13 +33,22 @@ ProcInfo CacheGetProcInfo(unsigned int pid, ProcInfo& info)
 	static bool is_os64 = UNONE::OsIs64();
 	info.pid = pid;
 	if (info.ppid == -1) info.ppid = UNONE::PsGetParentPid(pid);
+	if (info.parent_existed == -1) {
+		// May be parent id occupied by someone implies parent not existed
+		info.parent_existed = 1;
+		auto ppid = info.ppid;
+		auto tm1 = ProcessCreateTimeValue(pid);
+		auto tm2 = ProcessCreateTimeValue(ppid);
+		if (UNONE::PsIsDeleted(ppid) || (tm1 && tm2 && tm1 < tm2))
+			info.parent_existed = 0;
+	}
 	auto &&path = UNONE::PsGetProcessPathW(pid);
 	info.path = WStrToQ(path);
-	std::wstring company, descript;
-	UNONE::FsGetFileInfoW(path, L"CompanyName", company);
-	UNONE::FsGetFileInfoW(path, L"FileDescription", descript);
-	info.corp = WStrToQ(company);
-	info.desc = WStrToQ(descript);
+	std::wstring corp, desc;
+	UNONE::FsGetFileInfoW(path, L"CompanyName", corp);
+	UNONE::FsGetFileInfoW(path, L"FileDescription", desc);
+	info.corp = WStrToQ(corp);
+	info.desc = WStrToQ(desc);
 	if (info.name.isEmpty()) info.name = WStrToQ(UNONE::FsPathToNameW(path));
 	info.ctime = WStrToQ(ProcessCreateTime(pid));
 	if (is_os64 && !UNONE::PsIsX64(pid))	info.name.append(" *32");
@@ -53,7 +63,7 @@ void CacheGetProcChilds(unsigned int pid, QVector<ProcInfo>& infos)
 	}
 	QMutexLocker locker(&proc_info.lck);
 	for (auto &info : proc_info.d) {
-		if (info.ppid == pid) {
+		if (info.parent_existed == 1 && info.ppid == pid) {
 			infos.push_back(info);
 		}
 	}
@@ -88,5 +98,27 @@ UNONE::PROCESS_BASE_INFOW CacheGetProcessBaseInfo(DWORD pid)
 	}
 	UNONE::PsGetProcessInfoW(pid, info);
 	proc_baseinfo.d.insert(pid, info);
+	return info;
+}
+
+static struct {
+	QMutex lck;
+	QMap<QString, FileBaseInfo> d;
+} filebase_info;
+
+FileBaseInfo CacheGetFileBaseInfo(QString path)
+{
+	QMutexLocker locker(&filebase_info.lck);
+	if (filebase_info.d.contains(path)) {
+		auto it = filebase_info.d.find(path);
+		return it.value();
+	}
+	std::wstring corp, desc, ver;
+	auto w_path = path.toStdWString();
+	UNONE::FsGetFileInfoW(w_path, L"CompanyName", corp);
+	UNONE::FsGetFileInfoW(w_path, L"FileDescription", desc);
+	UNONE::FsGetFileVersionW(w_path, ver);
+	auto info = FileBaseInfo{ path, WStrToQ(desc), WStrToQ(ver),  WStrToQ(corp) };
+	filebase_info.d.insert(path, info);
 	return info;
 }

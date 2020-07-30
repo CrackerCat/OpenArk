@@ -16,8 +16,6 @@
 #pragma once
 #include "../common/common.h"
 
-bool ReadConsoleOutput(const std::string& Cmdline, std::string& Output, DWORD& ExitCode, DWORD Timeout = INFINITE);
-
 enum {
 	ECMD_PARAM_INVALID,
 	ECMD_NOSUCH_CMD,
@@ -31,33 +29,30 @@ public:
 	~Cmds ();
 
 public:
-	Q_INVOKABLE void CmdHelp(QStringList argv);
-	Q_INVOKABLE void CmdCls(QStringList argv);
-	Q_INVOKABLE void CmdHistory(QStringList argv);
-	Q_INVOKABLE void CmdTimeStamp(QStringList argv);
-	Q_INVOKABLE void CmdErrorShow(QStringList argv);
-	Q_INVOKABLE void CmdFormats(QStringList argv);
-	Q_INVOKABLE void CmdExit(QStringList argv);
-	Q_INVOKABLE void CmdRestart(QStringList argv);
-	Q_INVOKABLE void CmdCmd(QStringList argv);
-	Q_INVOKABLE void CmdStart(QStringList argv);
-	Q_INVOKABLE void CmdMsg(QStringList argv);
-	Q_INVOKABLE void CmdWndInfo(QStringList argv);
-	Q_INVOKABLE void CmdProcessInfo(QStringList argv);
-	Q_INVOKABLE void CmdProcessTree(QStringList argv);
-	Q_INVOKABLE void CmdMemoryInfo(QStringList argv);
+	Q_INVOKABLE void CmdHelp(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdCls(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdHistory(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdTimeStamp(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdErrorShow(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdFormats(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdExit(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdRestart(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdCmd(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdStart(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdMsg(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdWndInfo(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdProcessInfo(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdProcessTree(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdMemoryEditor(QString cmd, QStringList argv);
+	Q_INVOKABLE void CmdFileEditor(QString cmd, QStringList argv);
 
 	QString CmdGetLast();
 	QString CmdGetNext();
-	void CmdException(int type);
+	void CmdException(QString cmd, int type);
 	void CmdErrorOutput(const std::wstring &err);
 	void CmdOutput(const char* format, ...);
 	void CmdOutput(const wchar_t* format, ...);
 	void CmdDispatcher(const std::wstring &cmdline);
-
-private:
-	int VariantInt(std::string val, int radix = 16);
-	int64_t VariantInt64(std::string val, int radix = 16);
 
 	size_t cmd_cursor_;
 	QStringList cmd_history_;
