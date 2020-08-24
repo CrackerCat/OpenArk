@@ -15,5 +15,6 @@
 ****************************************************************************/
 #pragma once
 #include <ntifs.h>
-BOOLEAN InitMemoryDispatcher();
-NTSTATUS MemoryDispatcher(IN ULONG op, IN PDEVICE_OBJECT devobj, IN PIRP irp);
+#include <arkdrv-api/arkdrv-api.h>
+
+NTSTATUS StorageDispatcher(IN ULONG op, IN PDEVICE_OBJECT devobj, IN PIRP irp);

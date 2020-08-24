@@ -17,6 +17,9 @@
 #include "../common/common.h"
 #include <QString>
 #include <QtCore>
+#include <arkdrv-api/arkdrv-api.h>
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
 
 std::wstring FormatFileTime(FILETIME *file_tm)
 {
@@ -45,7 +48,7 @@ std::wstring CalcFileTime(FILETIME *file_tm)
 
 bool RetrieveThreadTimes(DWORD tid, std::wstring& ct, std::wstring& kt, std::wstring& ut)
 {
-	HANDLE thd = OpenThread(THREAD_QUERY_INFORMATION, FALSE, tid);
+	HANDLE thd = ArkDrvApi::Process::OpenThread(THREAD_QUERY_INFORMATION, FALSE, tid);
 	if (!thd) {
 		return false;
 	}
@@ -68,7 +71,7 @@ bool RetrieveThreadTimes(DWORD tid, std::wstring& ct, std::wstring& kt, std::wst
 
 std::wstring ProcessCreateTime(__in DWORD pid)
 {
-	HANDLE Process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+	HANDLE Process = ArkDrvApi::Process::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (!Process) {
 		return L"";
 	}
@@ -87,18 +90,19 @@ std::wstring ProcessCreateTime(__in DWORD pid)
 
 LONGLONG ProcessCreateTimeValue(__in DWORD pid)
 {
-	HANDLE Process = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
-	if (!Process) return 0;
-
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
+	if (!phd) {
+		return 0;
+	}
 	FILETIME create_tm;
 	FILETIME exit_tm;
 	FILETIME kern_tm;
 	FILETIME user_tm;
-	if (!GetProcessTimes(Process, &create_tm, &exit_tm, &kern_tm, &user_tm)) {
-		CloseHandle(Process);
+	if (!GetProcessTimes(phd, &create_tm, &exit_tm, &kern_tm, &user_tm)) {
+		CloseHandle(phd);
 		return 0;
 	}
-	CloseHandle(Process);
+	CloseHandle(phd);
 	return UNONE::TmFileTimeToMs(create_tm);
 }
 
@@ -118,7 +122,7 @@ bool CreateDump(DWORD pid, const std::wstring& path, bool mini)
 		dmp_type = (MINIDUMP_TYPE)(MiniDumpWithThreadInfo | MiniDumpWithFullMemoryInfo | MiniDumpWithTokenInformation |
 			MiniDumpWithProcessThreadData | MiniDumpWithDataSegs | MiniDumpWithFullMemory | MiniDumpWithHandleData);
 	}
-	HANDLE phd = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
 	if (!phd) {
 		return false;
 	}
@@ -199,7 +203,7 @@ SIZE_T GetProcessPrivateWorkingSet(DWORD pid)
 	PROCESS_MEMORY_COUNTERS_EX mm_info;
 	if (!UNONE::MmGetProcessMemoryInfo(pid, mm_info))
 		return 0;
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
 		return 0;
 	}
@@ -545,7 +549,6 @@ bool ReadStdout(const std::wstring& cmdline, std::wstring& output, DWORD& exitco
 	return result;
 }
 
-#define INVALID_PID -1
 DWORD PsGetPidByWindowW(wchar_t *cls, wchar_t *title)
 {
 	DWORD pid = INVALID_PID;
@@ -558,4 +561,63 @@ DWORD PsGetPidByWindowW(wchar_t *cls, wchar_t *title)
 DWORD OsGetExplorerPid()
 {
 	return PsGetPidByWindowW(L"Progman", L"Program Manager");
+}
+
+/*++
+Description:
+	load driver registry
+Arguments:
+	file_path - driver file path
+	srv_name - driver service name
+Return:
+	bool
+--*/
+bool ObLoadDriverRegistryW(__in const std::wstring &file_path, __in std::wstring srv_name)
+{
+	HKEY subkey = NULL;
+	do {
+		std::wstring driver_path = UNONE::FsPathStandardW(L"\\??\\" + file_path);
+		DWORD dispos;
+		std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+		LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, key_name.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &subkey, &dispos);
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegCreateKeyExW %s err:%d", key_name.c_str(), result);
+			return false;
+		}
+		DWORD start = SERVICE_DEMAND_START;
+		result = RegSetValueExW(subkey, L"Start", 0, REG_DWORD, (BYTE*)&start, sizeof(start));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		DWORD type = SERVICE_KERNEL_DRIVER;
+		result = RegSetValueExW(subkey, L"Type", 0, REG_DWORD, (BYTE*)&type, sizeof(type));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		DWORD errctl = SERVICE_ERROR_NORMAL;
+		result = RegSetValueExW(subkey, L"ErrorControl", 0, REG_DWORD, (BYTE*)&errctl, sizeof(errctl));
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+
+		result = RegSetValueExW(subkey, L"ImagePath", 0, REG_EXPAND_SZ, (BYTE*)driver_path.c_str(), (DWORD)driver_path.size() * 2);
+		if (result != ERROR_SUCCESS) {
+			UNONE_ERROR(L"RegSetValueW err:%d", result);
+			break;
+		}
+	} while (0);
+	if (subkey)	RegCloseKey(subkey);
+	return true;
+}
+
+bool ObUnloadDriverRegistryW(__in const std::wstring &srv_name)
+{
+	std::wstring key_name = L"SYSTEM\\CurrentControlSet\\services\\" + srv_name;
+	SHDeleteKeyW(HKEY_LOCAL_MACHINE, key_name.c_str());
+	return true;
 }

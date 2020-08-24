@@ -14,8 +14,8 @@
 **
 ****************************************************************************/
 #include "common.h"
-#include "../driver/driver.h"
-#include "../notify/notify.h"
+#include "../kdriver/kdriver.h"
+#include "../knotify/knotify.h"
 
 ARK_DRIVER ArkDrv;
 
@@ -40,4 +40,32 @@ PVOID GetNtRoutineAddress(IN PCWSTR name)
 	UNICODE_STRING ustr;
 	RtlInitUnicodeString(&ustr, name);
 	return MmGetSystemRoutineAddress(&ustr);
+}
+
+NTSTATUS DuplicateInputBuffer(IN PIRP irp, PVOID &inbuf)
+{
+	NTSTATUS status = STATUS_SUCCESS;
+	PIO_STACK_LOCATION	irpstack; 
+	PVOID inbuf_dup = NULL;
+	PVOID outbuf = NULL;
+	ULONG inlen = 0;
+	irpstack = IoGetCurrentIrpStackLocation(irp);
+	inlen = irpstack->Parameters.DeviceIoControl.InputBufferLength - 4;
+	if (inbuf && inlen) {
+		inbuf_dup = ExAllocatePoolWithTag(NonPagedPool, inlen, ARK_POOLTAG);
+		if (!inbuf_dup) return STATUS_MEMORY_NOT_ALLOCATED;
+		RtlCopyMemory(inbuf_dup, inbuf, inlen);
+		inbuf = inbuf_dup;
+	}
+	return status;
+}
+
+NTSTATUS ReleaseInputBuffer(IN PIRP irp, PVOID &inbuf)
+{
+	NTSTATUS status = STATUS_SUCCESS;
+	if (inbuf) {
+		inbuf = NULL;
+		ExFreePoolWithTag(inbuf, ARK_POOLTAG);
+	}
+	return status;
 }

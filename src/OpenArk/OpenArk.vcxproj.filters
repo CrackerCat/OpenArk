@@ -129,6 +129,30 @@
     <Filter Include="common\ui-wrapper">
       <UniqueIdentifier>{16858abf-3377-4e71-84fa-f20c0e3a4d9d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="kernel\arkdrv-api\api-storage">
+      <UniqueIdentifier>{78d6877a-f6ca-4711-8aa7-6aefef846466}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-memory">
+      <UniqueIdentifier>{ce50d15f-ff76-4aba-a3a7-6b7c249a2017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-wingui">
+      <UniqueIdentifier>{bd006a0b-cf6e-41ca-8c17-c4ad9285a4d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-driver">
+      <UniqueIdentifier>{48821978-f9aa-40fd-acf1-1eb3634f8cfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-notify">
+      <UniqueIdentifier>{f1f12241-3765-4f6e-ac39-7f8bcbe974bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-process">
+      <UniqueIdentifier>{5c43bebc-7e56-49fc-8b05-d4d9b1bd8659}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\arkdrv-api\api-object">
+      <UniqueIdentifier>{09a5ab93-f89a-4bc2-a217-38b93e6292e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kernel\object">
+      <UniqueIdentifier>{d182a510-0632-4c4a-a913-91db1451a2ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="openark\openark.cpp">
@@ -273,6 +297,30 @@
     <ClCompile Include="kernel\memory\memory.cpp">
       <Filter>kernel\memory</Filter>
     </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-storage\api-storage.cpp">
+      <Filter>kernel\arkdrv-api\api-storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-memory\api-memory.cpp">
+      <Filter>kernel\arkdrv-api\api-memory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-wingui\api-wingui.cpp">
+      <Filter>kernel\arkdrv-api\api-wingui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-driver\api-driver.cpp">
+      <Filter>kernel\arkdrv-api\api-driver</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-notify\api-notify.cpp">
+      <Filter>kernel\arkdrv-api\api-notify</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-process\api-process.cpp">
+      <Filter>kernel\arkdrv-api\api-process</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OpenArkDrv\arkdrv-api\api-object\api-object.cpp">
+      <Filter>kernel\arkdrv-api\api-object</Filter>
+    </ClCompile>
+    <ClCompile Include="kernel\object\object.cpp">
+      <Filter>kernel\object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="openark\openark.h">
@@ -329,6 +377,12 @@
     <QtMoc Include="kernel\memory\memory.h">
       <Filter>kernel\memory</Filter>
     </QtMoc>
+    <QtMoc Include="kernel\driver\driver.h">
+      <Filter>kernel\driver</Filter>
+    </QtMoc>
+    <QtMoc Include="kernel\object\object.h">
+      <Filter>kernel\object</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="ui\process-mgr.ui">
@@ -365,6 +419,9 @@
       <Filter>ui</Filter>
     </QtUic>
     <QtUic Include="ui\reverse.ui">
+      <Filter>ui</Filter>
+    </QtUic>
+    <QtUic Include="res\ui\memory-rw.ui">
       <Filter>ui</Filter>
     </QtUic>
   </ItemGroup>
@@ -441,9 +498,6 @@
     <ClInclude Include="res\resource.h">
       <Filter>res</Filter>
     </ClInclude>
-    <ClInclude Include="kernel\driver\driver.h">
-      <Filter>kernel\driver</Filter>
-    </ClInclude>
     <ClInclude Include="kernel\notify\notify.h">
       <Filter>kernel\notify</Filter>
     </ClInclude>
@@ -494,6 +548,27 @@
     </ClInclude>
     <ClInclude Include="common\win-wrapper\reg-wrapper.h">
       <Filter>common\win-wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-storage\api-storage.h">
+      <Filter>kernel\arkdrv-api\api-storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-memory\api-memory.h">
+      <Filter>kernel\arkdrv-api\api-memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-wingui\api-wingui.h">
+      <Filter>kernel\arkdrv-api\api-wingui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-driver\api-driver.h">
+      <Filter>kernel\arkdrv-api\api-driver</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-notify\api-notify.h">
+      <Filter>kernel\arkdrv-api\api-notify</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-process\api-process.h">
+      <Filter>kernel\arkdrv-api\api-process</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OpenArkDrv\arkdrv-api\api-object\api-object.h">
+      <Filter>kernel\arkdrv-api\api-object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

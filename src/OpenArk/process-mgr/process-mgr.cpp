@@ -19,6 +19,7 @@
 #include "../openark/openark.h"
 #include "process-properties.h"
 #include "process-selection.h"
+#include <arkdrv-api/arkdrv-api.h>
 
 // ProcessView's header index
 struct {
@@ -445,7 +446,7 @@ void ProcessMgr::onCloseHandle()
 {
 	auto src_hd = (HANDLE)(UNONE::StrToHex64A(BottomCurViewItemData(HD.value).toStdString()));
 	DWORD pid = ProcCurPid();
-	HANDLE phd = OpenProcess(PROCESS_DUP_HANDLE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_DUP_HANDLE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
 		ERR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
 		return;
@@ -513,7 +514,7 @@ void ProcessMgr::onHideMemoryItem(bool checked)
 void ProcessMgr::onDumpMemory()
 {
 	DWORD pid = ProcCurPid();
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	if (!phd) {
 		ERR(L"OpenProcess pid:%d err:%d", pid, GetLastError());
 		return;
@@ -583,6 +584,13 @@ void ProcessMgr::onShowModule()
 	ClearItemModelData(bottom_model_, 0);
 	InitModuleView();
 	DWORD pid = ProcCurPid();
+	bool activate = false;
+	auto &&path = UNONE::PsGetProcessPathW(pid);
+	if (path.empty()) {
+		UNONE::InterCreateTlsValue(ArkDrvApi::Process::OpenProcessR0, UNONE::PROCESS_VID);
+		path = UNONE::PsGetProcessPathW(pid);
+		activate = true;
+	}
 	UNONE::PsEnumModule(pid, [&](MODULEENTRY32W& entry)->bool{
 		QString modname = WCharsToQ(entry.szModule);
 		QString modpath = WCharsToQ(entry.szExePath);
@@ -630,11 +638,11 @@ void ProcessMgr::onShowHandle()
 	InitHandleView();
 	InitObjectTypeTable();
 	DWORD pid = ProcCurPid();
-	HANDLE phd = OpenProcess(PROCESS_DUP_HANDLE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_DUP_HANDLE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	UNONE::PsEnumHandle(pid, [&](SYSTEM_HANDLE_TABLE_ENTRY_INFO &info)->bool {
 		auto count = bottom_model_->rowCount();
 		auto idx = info.ObjectTypeIndex;
-		QStandardItem *type_item = new QStandardItem(StrToQ(UNONE::StrFormatA("%s (%02d)",ObjectTypeTable[idx].c_str(), idx)));
+		QStandardItem *type_item = new QStandardItem(WStrToQ(UNONE::StrFormatW(L"%s (%02d)",ObjectTypeTable[idx].c_str(), idx)));
 		std::string name;
 		if (phd != NULL) {
 			HANDLE dup = NULL;
@@ -655,7 +663,7 @@ void ProcessMgr::onShowHandle()
 				}
 				default:
 					ObGetObjectName((HANDLE)dup, name);
-					static int file_idx = GetObjectTypeIndex("File");
+					static int file_idx = GetObjectTypeIndex(L"File");
 					if (idx == file_idx) UNONE::ObParseToDosPathA(name, name);
 					break;
 				}
@@ -684,7 +692,7 @@ void ProcessMgr::onShowMemory()
 	InitMemoryView();
 
 	DWORD pid = ProcCurPid();
-	HANDLE phd = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+	HANDLE phd = ArkDrvApi::Process::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
 	UNONE::PsEnumMemory(pid, [&](MEMORY_BASIC_INFORMATION &mbi)->bool {
 		
 		std::wstring mod_name;

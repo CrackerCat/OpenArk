@@ -16,6 +16,10 @@
 #include "qt-wrapper.h"
 #include "../common/common.h"
 
+OpenArk *openark = nullptr;
+QTranslator *app_tr = nullptr;
+QApplication *app = nullptr;
+
 QSize OpenArkTabStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const
 {
 	QSize s = QProxyStyle::sizeFromContents(type, option, size, widget);
@@ -111,9 +115,27 @@ void OpenArkLanguage::ChangeLanguage(int lang)
 
 QIcon LoadIcon(QString file_path)
 {
+	static struct {
+		QMutex lck;
+		QMap<QString, QIcon> d;
+	} icon_cache;
+	QMutexLocker locker(&icon_cache.lck);
+	if (icon_cache.d.contains(file_path)) {
+		auto it = icon_cache.d.find(file_path);
+		return it.value();
+	}
 	QFileInfo file_info(file_path);
-	QFileIconProvider icon;
-	return icon.icon(file_info);
+	QFileIconProvider provider;
+	QIcon &ico = provider.icon(file_info);
+	for (auto qs : ico.availableSizes()) {
+		if (!ico.pixmap(qs).isNull()) {
+			icon_cache.d.insert(file_path, ico);
+			return ico;
+		}
+	}
+	ico = QIcon(":/OpenArk/revtools/default.ico");
+	icon_cache.d.insert(file_path, ico);
+	return ico;
 }
 
 bool IsContainAction(QMenu *menu, QObject *obj)
@@ -219,6 +241,27 @@ void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model)
 	//view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	view->header()->setMinimumSectionSize(100);
 	view->setSortingEnabled(true);
+}
+
+void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model, 
+	QSortFilterProxyModel *proxy, std::pair<int, QString> colum_layout[], int count)
+{
+	proxy->setSourceModel(model);
+	proxy->setDynamicSortFilter(true);
+	proxy->setFilterKeyColumn(1);
+	view->setModel(proxy);
+	view->selectionModel()->setModel(proxy);
+	view->header()->setSortIndicator(-1, Qt::AscendingOrder);
+	view->setSortingEnabled(true);
+	view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	QStringList name_list;
+	for (int i = 0; i < count; i++) {
+		name_list << colum_layout[i].second;
+	}
+	model->setHorizontalHeaderLabels(name_list);
+	for (int i = 0; i < count; i++) {
+		view->setColumnWidth(i, colum_layout[i].first);
+	}
 }
 
 void SetLineBgColor(QStandardItemModel *model, int row, const QBrush &abrush)

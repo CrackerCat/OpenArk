@@ -19,7 +19,17 @@
 #include <windef.h>
 #else
 #include <Windows.h>
+#include <common/app/app.h>
 #endif //_NTDDK_
+
+#include "api-storage/api-storage.h"
+#include "api-memory/api-memory.h"
+#include "api-wingui/api-wingui.h"
+#include "api-driver/api-driver.h"
+#include "api-notify/api-notify.h"
+#include "api-object/api-object.h"
+#include "api-process/api-process.h"
+
 
 #define ARK_NTDEVICE_NAME L"\\Device\\OpenArkDrv"
 #define ARK_DOSDEVICE_NAME L"\\DosDevices\\OpenArkDrv"
@@ -32,99 +42,9 @@
 #define IOCTL_ARK_NOTIFY CTL_CODE(ARK_DRV_TYPE, 0x802, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define IOCTL_ARK_MEMORY CTL_CODE(ARK_DRV_TYPE, 0x803, METHOD_BUFFERED, FILE_ANY_ACCESS)
 #define IOCTL_ARK_HOTKEY CTL_CODE(ARK_DRV_TYPE, 0x900, METHOD_BUFFERED, FILE_ANY_ACCESS)
-
-// Driver
-enum DRIVER_OPS {
-	DRIVER_ENUM_INFO,
-};
-#pragma pack(push, 1)
-typedef struct _DRIVER_ITEM {
-	ULONG64 base;
-	ULONG size;
-	ULONG flags;
-	USHORT load_seq;
-	USHORT init_seq;
-	UCHAR  path[256];
-} DRIVER_ITEM, *PDRIVER_ITEM;
-typedef struct _DRIVER_INFO {
-	ULONG count;
-	DRIVER_ITEM items[1];
-} DRIVER_INFO, *PDRIVER_INFO;
-#pragma pack(pop)
-
-// Notify
-enum NOTIFY_OPS {
-	NOTIFY_PATCH,
-	NOTIFY_PATCH_REGULARLY,
-	NOTIFY_REMOVE,
-	NOTIFY_REMOVE_REGULARLY,
-	NOTIFY_ENUM_PROCESS,
-	NOTIFY_ENUM_THREAD,
-	NOTIFY_ENUM_IMAGE,
-	NOTIFY_ENUM_REGISTRY,
-};
-enum NOTIFY_TYPE {
-	CREATE_PROCESS,
-	CREATE_THREAD,
-	LOAD_IMAGE,
-	CM_REGISTRY,
-};
-#pragma pack(push, 1)
-typedef struct _NOTIFY_INFO {
-	ULONG count;
-	NOTIFY_TYPE type;
-	ULONG64 items[1];
-} NOTIFY_INFO, *PNOTIFY_INFO;
-typedef struct _NOTIFY_REMOVE_INFO {
-	NOTIFY_TYPE type;
-	ULONG64 item;
-} NOTIFY_REMOVE_INFO, *PNOTIFY_REMOVE_INFO;
-#pragma pack(pop)
-
-// Memory
-enum MEMORY_OPS {
-	MEMORY_READ,
-	MEMORY_WRITE,
-};
-#pragma pack(push, 1)
-typedef struct _MEMORY_IN {
-	ULONG64 addr;
-	ULONG size;
-	union {
-		UCHAR dummy[1];
-		UCHAR writebuf[1];
-	} u;
-} MEMORY_IN, *PMEMORY_IN;
-typedef struct _MEMORY_OUT {
-	ULONG size;
-	UCHAR readbuf[1];
-} MEMORY_OUT, *PMEMORY_OUT;
-#pragma pack(pop)
-
-// WinGUI
-#define HOTKEY_MAX_VK	0x80
-#define HOTKEY_PLACEHOLDER_ID 0x99887766
-enum HOTKEY_OPS {
-	HOTKEY_ENUM,
-	HOTKEY_REMOVE,
-};
-#pragma pack(push, 1)
-typedef struct _HOTKEY_ITEM {
-	UCHAR name[64];
-	UINT32 wnd;
-	UINT16 mod1;
-	UINT16 mod2;
-	UINT32 vk;
-	UINT32 id;
-	UINT32 pid;
-	UINT32 tid;
-	ULONG64 hkobj;
-} HOTKEY_ITEM, *PHOTKEY_ITEM;
-typedef struct _HOTKEY_INFO {
-	ULONG count;
-	HOTKEY_ITEM items[1];
-} HOTKEY_INFO, *PHOTKEY_INFO;
-#pragma pack(pop)
+#define IOCTL_ARK_STORAGE CTL_CODE(ARK_DRV_TYPE, 0x920, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_ARK_OBJECT CTL_CODE(ARK_DRV_TYPE, 0x940, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define IOCTL_ARK_PROCESS CTL_CODE(ARK_DRV_TYPE, 0x960, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 //#undef _ARKDRV_
 #ifdef _ARKDRV_
@@ -134,21 +54,17 @@ typedef struct _HOTKEY_INFO {
 #include <string>
 #include <vector>
 namespace ArkDrvApi {
+extern HANDLE arkdrv;
 bool ConnectDriver();
 bool DisconnectDriver();
 bool HeartBeatPulse();
-bool DriverEnumInfo(std::vector<DRIVER_ITEM> &infos);
-bool NotifyPatch(NOTIFY_TYPE type, ULONG64 routine);
-bool NotifyPatchRegularly(NOTIFY_TYPE type, ULONG64 routine, int interval);
-bool NotifyRemove(NOTIFY_TYPE type, ULONG64 routine);
-bool NotifyRemoveRegularly(NOTIFY_TYPE type, ULONG64 routine, int interval);
-bool NotifyEnumProcess(std::vector<ULONG64> &routines);
-bool NotifyEnumThread(std::vector<ULONG64> &routines);
-bool NotifyEnumImage(std::vector<ULONG64> &routines);
-bool NotifyEnumRegistry(std::vector<ULONG64> &routines);
-bool MemoryRead(ULONG64 addr, ULONG size, std::string &readbuf);
-bool MemoryWrite(std::string &writebuf, ULONG64 addr);
-bool HotkeyEnumInfo(std::vector<HOTKEY_ITEM> &hotkeys);
-bool HotkeyRemoveInfo(HOTKEY_ITEM &item);
+bool IoControlDriver(DWORD ctlcode, DWORD op, PVOID inbuf, DWORD inlen, PVOID *outbuf, DWORD *outlen);
+bool IoControlDriver(DWORD ctlcode, DWORD op, const std::wstring &indata, std::string &outdata);
+bool IoControlDriver(DWORD ctlcode, DWORD op, const std::string &indata, std::string &outdata);
+
+#define TO_STREAM(st) std::string((char*)&st, sizeof(st))
+#define TO_STREAM_P(pst, size) std::string((char*)pst, size)
+#define TO_STRUCT(str, type) ((type)str.c_str())
+
 } // namespace ArkDrvApi
 #endif //_NTDDK_

@@ -22,6 +22,7 @@
 
 class Ui::Kernel;
 class Kernel;
+class KernelMemoryRW;
 
 class KernelMemory : public CommonTabObject {
 	Q_OBJECT
@@ -36,15 +37,46 @@ public:
 public:
 	bool EventFilter();
 	void ModuleInit(Ui::Kernel *mainui, Kernel *kernel);
-	void ShowDumpMemory(ULONG64 addr, ULONG size);
 
 private slots:
 	void onTabChanged(int index);
 
 private:
-	void ShowUnlockFiles();
+	Ui::Kernel *ui;
+	KernelMemoryRW *memrw_;
+};
 
+class KernelMemoryRW : public QWidget {
+	Q_OBJECT
+
+public:
+	KernelMemoryRW();
+	~KernelMemoryRW();
 
 private:
-	Ui::Kernel *ui;
+	QWidget *memui_;
+	std::function<void(QList<QVariant>)> free_callback_;
+	QList<QVariant> free_vars_;
+
+public:
+	void RegFreeCallback(std::function<void(QList<QVariant>)> callback, QList<QVariant> vars) {
+		free_callback_ = callback;
+		free_vars_ = vars;
+	};
+	void ViewMemory(ULONG pid, ULONG64 addr, ULONG size);
+	void ViewMemory(ULONG pid, std::string data);
+	void WriteMemory(std::string data);
+	void OpenNewWindow(QWidget *parent, ULONG64 addr, ULONG size)
+	{
+		auto memwidget = this->GetWidget();
+		memwidget->findChild<QLineEdit*>("readAddrEdit")->setText(QString::number(addr,16).toUpper());
+		memwidget->findChild<QLineEdit*>("readSizeEdit")->setText(DWordToHexQ(size));
+		memwidget->setParent(parent);
+		memwidget->setWindowTitle(tr("Memory Read-Write"));
+		memwidget->setWindowFlags(Qt::Window);
+		memwidget->resize(1000, 530);
+		memwidget->show();
+	}
+	QWidget *GetWidget() const { return memui_; };
+
 };

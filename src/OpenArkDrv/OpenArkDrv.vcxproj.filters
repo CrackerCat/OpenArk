@@ -1,39 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="driver\driver.cpp">
-      <Filter>driver</Filter>
-    </ClCompile>
     <ClCompile Include="common\common.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="notify\notify.cpp">
-      <Filter>notify</Filter>
-    </ClCompile>
     <ClCompile Include="driver-entry.cpp" />
-    <ClCompile Include="notify\notify-lib.cpp">
-      <Filter>notify</Filter>
-    </ClCompile>
     <ClCompile Include="arkdrv-api\arkdrv-api.cpp">
       <Filter>arkdrv-api</Filter>
     </ClCompile>
-    <ClCompile Include="memory\memory.cpp">
-      <Filter>memory</Filter>
+    <ClCompile Include="arkdrv-api\api-storage\api-storage.cpp">
+      <Filter>arkdrv-api\api-storage</Filter>
     </ClCompile>
-    <ClCompile Include="wingui\ops-hotkey\ops-hotkey.cpp">
-      <Filter>wingui\ops-hotkey</Filter>
+    <ClCompile Include="arkdrv-api\api-memory\api-memory.cpp">
+      <Filter>arkdrv-api\api-memory</Filter>
     </ClCompile>
-    <ClCompile Include="wingui\ops-hotkey\utils\utils.cpp">
-      <Filter>wingui\ops-hotkey\utils</Filter>
+    <ClCompile Include="arkdrv-api\api-wingui\api-wingui.cpp">
+      <Filter>arkdrv-api\api-wingui</Filter>
+    </ClCompile>
+    <ClCompile Include="arkdrv-api\api-driver\api-driver.cpp">
+      <Filter>arkdrv-api\api-driver</Filter>
+    </ClCompile>
+    <ClCompile Include="arkdrv-api\api-notify\api-notify.cpp">
+      <Filter>arkdrv-api\api-notify</Filter>
+    </ClCompile>
+    <ClCompile Include="kobject\kobject.cpp">
+      <Filter>kobject</Filter>
+    </ClCompile>
+    <ClCompile Include="arkdrv-api\api-object\api-object.cpp">
+      <Filter>arkdrv-api\api-object</Filter>
+    </ClCompile>
+    <ClCompile Include="kstorage\kstorage.cpp">
+      <Filter>kstorage</Filter>
+    </ClCompile>
+    <ClCompile Include="kstorage\unlock\handle.cpp">
+      <Filter>kstorage\unlock</Filter>
+    </ClCompile>
+    <ClCompile Include="kprocess\kprocess.cpp">
+      <Filter>kprocess</Filter>
+    </ClCompile>
+    <ClCompile Include="arkdrv-api\api-process\api-process.cpp">
+      <Filter>arkdrv-api\api-process</Filter>
+    </ClCompile>
+    <ClCompile Include="kmemory\kmemory.cpp">
+      <Filter>kmemory</Filter>
+    </ClCompile>
+    <ClCompile Include="knotify\knotify.cpp">
+      <Filter>knotify</Filter>
+    </ClCompile>
+    <ClCompile Include="knotify\notify-lib.cpp">
+      <Filter>knotify</Filter>
+    </ClCompile>
+    <ClCompile Include="kdriver\kdriver.cpp">
+      <Filter>kdriver</Filter>
+    </ClCompile>
+    <ClCompile Include="kwingui\ops-hotkey\ops-hotkey.cpp">
+      <Filter>kwingui\ops-hotkey</Filter>
+    </ClCompile>
+    <ClCompile Include="kwingui\ops-hotkey\utils\utils.cpp">
+      <Filter>kwingui\ops-hotkey\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="common\c-assist.c">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="notify">
-      <UniqueIdentifier>{4f91c10f-34b3-49a6-bec2-ae813a57adba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="driver">
-      <UniqueIdentifier>{0524cfde-14fa-471f-84f3-8226224d739b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="common">
       <UniqueIdentifier>{9ae18d72-5aa6-4324-bfb8-f072171e9d02}</UniqueIdentifier>
     </Filter>
@@ -43,31 +73,73 @@
     <Filter Include="res">
       <UniqueIdentifier>{8842c31c-3e11-4d24-a5d1-b85db5f4f9f4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="memory">
+    <Filter Include="arkdrv-api\api-storage">
+      <UniqueIdentifier>{d0135cef-3e11-4a35-95c0-3fa91b0c12d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-memory">
+      <UniqueIdentifier>{a687d859-d322-44ff-ba51-a4482c53d836}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-wingui">
+      <UniqueIdentifier>{23d5b454-0811-46e0-b634-0f0796a7f604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-driver">
+      <UniqueIdentifier>{f948a1b5-7047-465c-b5fb-e421781a7c7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-notify">
+      <UniqueIdentifier>{d33ac1eb-bf03-4956-a223-cc88b4e8bccb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kmemory">
       <UniqueIdentifier>{c28bfcae-6bbe-4eee-a802-a10e966f708a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="wingui">
+    <Filter Include="kdriver">
+      <UniqueIdentifier>{0524cfde-14fa-471f-84f3-8226224d739b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="knotify">
+      <UniqueIdentifier>{4f91c10f-34b3-49a6-bec2-ae813a57adba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kstorage">
+      <UniqueIdentifier>{d5a7b29f-41a4-40d6-ada5-225fc7912c89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kwingui">
       <UniqueIdentifier>{c1698fd3-ea9a-40aa-a0b4-94d1a6f2ac53}</UniqueIdentifier>
     </Filter>
-    <Filter Include="wingui\ops-hotkey">
+    <Filter Include="kwingui\ops-hotkey">
       <UniqueIdentifier>{29d67cd2-6ecb-468d-a966-9ef786e9616c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="wingui\ops-hotkey\utils">
+    <Filter Include="kwingui\ops-hotkey\utils">
       <UniqueIdentifier>{09ee9ed7-a9de-4f95-8f43-811d97aa7892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kobject">
+      <UniqueIdentifier>{569bfed0-dd3a-4634-8f6f-658f2af0cbb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-object">
+      <UniqueIdentifier>{45f26e74-ab7c-4ebe-94d9-0e7e834344a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-network">
+      <UniqueIdentifier>{c12a0139-42f8-4799-a5b4-a8c9057e22ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-syscall">
+      <UniqueIdentifier>{3ed20b73-dc7c-4c0a-a633-c05a019791e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-interrupt">
+      <UniqueIdentifier>{345824c6-c039-4be5-8718-c18ad5c1b794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-hardware">
+      <UniqueIdentifier>{69cfcd0e-03b7-487a-b20e-cf328b65dbd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kstorage\unlock">
+      <UniqueIdentifier>{55575a92-bbc6-47fb-a521-102f3f00c280}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="kprocess">
+      <UniqueIdentifier>{a5e71621-ded3-4b4a-8a04-e27d8d0e6679}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="arkdrv-api\api-process">
+      <UniqueIdentifier>{7f5e488e-b7c6-4ed2-927c-3474da07f5ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="driver\driver.h">
-      <Filter>driver</Filter>
-    </ClInclude>
     <ClInclude Include="common\common.h">
       <Filter>common</Filter>
-    </ClInclude>
-    <ClInclude Include="notify\notify.h">
-      <Filter>notify</Filter>
-    </ClInclude>
-    <ClInclude Include="notify\notify-lib.h">
-      <Filter>notify</Filter>
     </ClInclude>
     <ClInclude Include="arkdrv-api\arkdrv-api.h">
       <Filter>arkdrv-api</Filter>
@@ -75,14 +147,59 @@
     <ClInclude Include="resource.h">
       <Filter>res</Filter>
     </ClInclude>
-    <ClInclude Include="memory\memory.h">
-      <Filter>memory</Filter>
+    <ClInclude Include="arkdrv-api\api-storage\api-storage.h">
+      <Filter>arkdrv-api\api-storage</Filter>
     </ClInclude>
-    <ClInclude Include="wingui\ops-hotkey\ops-hotkey.h">
-      <Filter>wingui\ops-hotkey</Filter>
+    <ClInclude Include="arkdrv-api\api-memory\api-memory.h">
+      <Filter>arkdrv-api\api-memory</Filter>
     </ClInclude>
-    <ClInclude Include="wingui\ops-hotkey\utils\utils.h">
-      <Filter>wingui\ops-hotkey\utils</Filter>
+    <ClInclude Include="arkdrv-api\api-wingui\api-wingui.h">
+      <Filter>arkdrv-api\api-wingui</Filter>
+    </ClInclude>
+    <ClInclude Include="arkdrv-api\api-driver\api-driver.h">
+      <Filter>arkdrv-api\api-driver</Filter>
+    </ClInclude>
+    <ClInclude Include="arkdrv-api\api-notify\api-notify.h">
+      <Filter>arkdrv-api\api-notify</Filter>
+    </ClInclude>
+    <ClInclude Include="kobject\kobject.h">
+      <Filter>kobject</Filter>
+    </ClInclude>
+    <ClInclude Include="arkdrv-api\api-object\api-object.h">
+      <Filter>arkdrv-api\api-object</Filter>
+    </ClInclude>
+    <ClInclude Include="kstorage\kstorage.h">
+      <Filter>kstorage</Filter>
+    </ClInclude>
+    <ClInclude Include="kstorage\unlock\handle.h">
+      <Filter>kstorage\unlock</Filter>
+    </ClInclude>
+    <ClInclude Include="kprocess\kprocess.h">
+      <Filter>kprocess</Filter>
+    </ClInclude>
+    <ClInclude Include="arkdrv-api\api-process\api-process.h">
+      <Filter>arkdrv-api\api-process</Filter>
+    </ClInclude>
+    <ClInclude Include="kmemory\kmemory.h">
+      <Filter>kmemory</Filter>
+    </ClInclude>
+    <ClInclude Include="knotify\knotify.h">
+      <Filter>knotify</Filter>
+    </ClInclude>
+    <ClInclude Include="knotify\notify-lib.h">
+      <Filter>knotify</Filter>
+    </ClInclude>
+    <ClInclude Include="kdriver\kdriver.h">
+      <Filter>kdriver</Filter>
+    </ClInclude>
+    <ClInclude Include="kwingui\ops-hotkey\ops-hotkey.h">
+      <Filter>kwingui\ops-hotkey</Filter>
+    </ClInclude>
+    <ClInclude Include="kwingui\ops-hotkey\utils\utils.h">
+      <Filter>kwingui\ops-hotkey\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="common\c-assist.h">
+      <Filter>common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

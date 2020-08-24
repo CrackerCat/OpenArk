@@ -16,10 +16,13 @@
 #include <ntifs.h>
 #include "arkdrv-api/arkdrv-api.h"
 #include "common/common.h"
-#include "driver/driver.h"
-#include "notify/notify.h"
-#include "memory/memory.h"
-#include "wingui/ops-hotkey/ops-hotkey.h"
+#include "kdriver/kdriver.h"
+#include "knotify/knotify.h"
+#include "kmemory/kmemory.h"
+#include "kwingui/ops-hotkey/ops-hotkey.h"
+#include "kstorage/kstorage.h"
+#include "kobject/kobject.h"
+#include "kprocess/kprocess.h"
 
 EXTERN_C NTSTATUS DriverEntry(PDRIVER_OBJECT drvobj, PUNICODE_STRING registry);
 NTSTATUS MainDispatcher(PDEVICE_OBJECT devobj, PIRP irp);
@@ -77,6 +80,7 @@ NTSTATUS MainDispatcher(PDEVICE_OBJECT devobj, PIRP irp)
 {
 	NTSTATUS status = STATUS_UNSUCCESSFUL;
 	PIO_STACK_LOCATION	irpstack;
+	PVOID inbuf_dup = NULL;
 	PVOID inbuf = NULL;
 	PVOID outbuf = NULL;
 	ULONG inlen = 0;
@@ -94,6 +98,15 @@ NTSTATUS MainDispatcher(PDEVICE_OBJECT devobj, PIRP irp)
 	if (!inbuf) return STATUS_INVALID_PARAMETER;
 	op = *(ULONG*)inbuf;
 
+	inlen = inlen - 4;
+	inbuf = (UCHAR*)inbuf + 4;
+
+	status = DuplicateInputBuffer(irp, inbuf);
+	if (!NT_SUCCESS(status)) return status;
+
+	outbuf = irp->AssociatedIrp.SystemBuffer;
+	outlen = irpstack->Parameters.DeviceIoControl.OutputBufferLength;
+
 	switch (ctlcode) {
 	case IOCTL_ARK_HEARTBEAT:
 		status = STATUS_SUCCESS;
@@ -105,10 +118,19 @@ NTSTATUS MainDispatcher(PDEVICE_OBJECT devobj, PIRP irp)
 		status = NotifyDispatcher(op, devobj, irp);
 		break;
 	case IOCTL_ARK_MEMORY:
-		status = MemoryDispatcher(op, devobj, irp);
+		status = MemoryDispatcher(op, devobj, inbuf, inlen, outbuf, outlen, irp);
 		break;
 	case IOCTL_ARK_HOTKEY:
 		status = HotkeyDispatcher(op, devobj, irp);
+		break;
+	case IOCTL_ARK_STORAGE:
+		status = StorageDispatcher(op, devobj, irp);
+		break;
+	case IOCTL_ARK_OBJECT:
+		status = ObjectDispatcher(op, devobj, inbuf, inlen, outbuf, outlen, irp);
+		break;
+	case IOCTL_ARK_PROCESS:
+		status = ProcessDispatcher(op, devobj, inbuf, inlen, outbuf, outlen, irp);
 		break;
 	default:
 		status = STATUS_INVALID_DEVICE_REQUEST;
