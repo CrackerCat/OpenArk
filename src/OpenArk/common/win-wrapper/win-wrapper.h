@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <array>
 #include <QString>
 #include "../common.h"
 #include "reg-wrapper.h"
@@ -49,3 +50,5 @@ DWORD PsGetPidByWindowW(wchar_t *cls, wchar_t *title);
 DWORD OsGetExplorerPid();
 bool ObLoadDriverRegistryW(__in const std::wstring &file_path, __in std::wstring srv_name);
 bool ObUnloadDriverRegistryW(__in const std::wstring &srv_name);
+bool PsKillProcess(__in DWORD pid);
+ULONG64 GetFreeLibraryAddress(DWORD pid);

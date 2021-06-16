@@ -55,10 +55,12 @@ private:
 	QString NasmAsm(std::string data, int bits, const std::string &format);
 	QString NasmDisasm(const std::string &data, int bits);
 	void SolveCodeTextFormat(std::string &text, std::string &format, int interval, int id);
+	std::string UrlEncode(const std::string &buf, std::vector<char> pass);
+	std::string UrlDecode(const std::string &buf);
+	std::string UrlEncodeURL(const std::string &buf);
 
 private:
 	Ui::CoderKit ui;
-	OpenArk* parent_;
 	std::mutex upt_mutex_;
 	int alg_idx_;
 	bool is_user_;

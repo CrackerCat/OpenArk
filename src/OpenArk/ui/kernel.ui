@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>582</height>
+    <width>752</width>
+    <height>450</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabKernelEntry">
       <attribute name="title">
@@ -70,7 +70,7 @@
      </widget>
      <widget class="QWidget" name="tab_4">
       <attribute name="title">
-       <string>Driver Manager</string>
+       <string>Kernel Driver</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_12">
        <property name="spacing">
@@ -91,7 +91,7 @@
        <item>
         <widget class="QTabWidget" name="tabDriver">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabDrivers">
           <attribute name="title">
@@ -504,11 +504,6 @@
        </property>
        <item>
         <widget class="QTreeView" name="notifyView">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
          <property name="indentation">
           <number>5</number>
          </property>
@@ -520,7 +515,7 @@
       <attribute name="title">
        <string>System Hotkey</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_81">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -535,28 +530,66 @@
        </property>
        <item>
         <widget class="QTreeView" name="hotkeyView">
-         <property name="font">
-          <font>
-           <pointsize>9</pointsize>
-          </font>
-         </property>
          <property name="indentation">
           <number>5</number>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Tips:If you not found the hotkeys,please check the shortcut keys of IME software.(eg:Microsoft/Sogou/Google IME, etc.)</string>
+        <layout class="QHBoxLayout" name="horizontalLayout_13">
+         <property name="leftMargin">
+          <number>5</number>
          </property>
-        </widget>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Filter:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="hkFilterEdit">
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="vkCodeLabel">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>&lt;a href=&quot;https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes&quot;&gt;Virtual-Key Codes&lt;/a&gt;</string>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_6">
       <attribute name="title">
-       <string>Object Manager</string>
+       <string>Kernel Object</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <property name="leftMargin">
@@ -609,6 +642,12 @@
           </layout>
          </widget>
          <widget class="QWidget" name="tabObjectSections">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <attribute name="title">
            <string>ObjectSections</string>
           </attribute>
@@ -640,7 +679,7 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Memory Manager</string>
+       <string>Kernel Memory</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <property name="spacing">
@@ -694,38 +733,13 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabMemoryRegion">
-          <attribute name="title">
-           <string>MemoryRegion</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_20">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QTreeView" name="MemoryRegionView"/>
-           </item>
-          </layout>
-         </widget>
         </widget>
        </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Storage Manager</string>
+       <string>Kernel Storage</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_19">
        <property name="spacing">
@@ -746,16 +760,13 @@
        <item>
         <widget class="QTabWidget" name="tabStorage">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
-         <widget class="QWidget" name="tabFileFilter">
+         <widget class="QWidget" name="tabFileUnlock">
           <attribute name="title">
-           <string>FileFilter</string>
+           <string>FileUnlock</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
-           <property name="spacing">
-            <number>0</number>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_15">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -768,20 +779,6 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
-            <widget class="QTreeView" name="fsfltView">
-             <property name="indentation">
-              <number>5</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabFileUnlock">
-          <attribute name="title">
-           <string>FileUnlock</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_15">
            <item>
             <widget class="QTreeView" name="unlockView">
              <property name="selectionMode">
@@ -797,6 +794,9 @@
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout">
+             <property name="leftMargin">
+              <number>5</number>
+             </property>
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
@@ -826,7 +826,7 @@
              <item>
               <widget class="QPushButton" name="showHoldBtn">
                <property name="text">
-                <string>ShowHold</string>
+                <string>&amp;ShowHold</string>
                </property>
               </widget>
              </item>
@@ -851,23 +851,23 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_2">
+              <widget class="QPushButton" name="unlockFileBtn">
                <property name="text">
-                <string>Unlock</string>
+                <string>&amp;Unlock</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton">
+              <widget class="QPushButton" name="unlockFileAllBtn">
                <property name="text">
-                <string>Unlock All</string>
+                <string>Unlock &amp;All</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_3">
+              <widget class="QPushButton" name="killProcessBtn">
                <property name="text">
-                <string>KillProcess</string>
+                <string>&amp;Kill Process</string>
                </property>
               </widget>
              </item>
@@ -881,7 +881,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Network Manager</string>
+       <string>Kernel Network</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <property name="spacing">
@@ -904,13 +904,13 @@
          <property name="currentIndex">
           <number>0</number>
          </property>
-         <widget class="QWidget" name="tabWfp">
+         <widget class="QWidget" name="tabPort">
           <attribute name="title">
-           <string>WFP</string>
+           <string>Port</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_9">
+          <layout class="QVBoxLayout" name="verticalLayout_16">
            <property name="spacing">
-            <number>0</number>
+            <number>6</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -925,24 +925,189 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QTreeView" name="wfpView"/>
+            <widget class="QTreeView" name="portView">
+             <property name="indentation">
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <item>
+              <widget class="QPushButton" name="locaIPv4Btn">
+               <property name="text">
+                <string>Local IPV4</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="locaIPv6Btn">
+               <property name="text">
+                <string>Local IPV6</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line_3">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Filter:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="portFilterEdit"/>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="ipv4CheckBox">
+               <property name="text">
+                <string>IPV4</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="ipv6CheckBox">
+               <property name="text">
+                <string>IPV6</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="tcpListenCheckBox">
+               <property name="text">
+                <string>TCP Listen</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="tcpConnCheckBox">
+               <property name="text">
+                <string>TCP Connection</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="udpListenCheckBox">
+               <property name="text">
+                <string>UDP Listen</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tabTdi">
+         <widget class="QWidget" name="tabHosts">
           <attribute name="title">
-           <string>TDI</string>
+           <string>Hosts</string>
           </attribute>
-         </widget>
-         <widget class="QWidget" name="tabNdis">
-          <attribute name="title">
-           <string>NDIS</string>
-          </attribute>
-         </widget>
-         <widget class="QWidget" name="tabPort">
-          <attribute name="title">
-           <string>Port</string>
-          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <item>
+              <widget class="QListWidget" name="hostsFileListWidget">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>180</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QTextEdit" name="hostsDataEdit">
+               <property name="acceptRichText">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
+             <item>
+              <widget class="QPushButton" name="hostsDirBtn">
+               <property name="text">
+                <string>&amp;HostsDirectory</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="hostsSaveBtn">
+               <property name="text">
+                <string>&amp;Save</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="hostsClearBtn">
+               <property name="text">
+                <string>&amp;Clear</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="hostsBackupBtn">
+               <property name="text">
+                <string>&amp;Backup</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="hostsRefreshBtn">
+               <property name="text">
+                <string>&amp;Refresh</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>

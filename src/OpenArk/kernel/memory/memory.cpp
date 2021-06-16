@@ -38,9 +38,9 @@ void KernelMemory::onTabChanged(int index)
 	CommonTabObject::onTabChanged(index);
 }
 
-bool KernelMemory::EventFilter()
+bool KernelMemory::eventFilter(QObject *obj, QEvent *e)
 {
-	return true;
+	return QWidget::eventFilter(obj, e);
 }
 
 void KernelMemory::ModuleInit(Ui::Kernel *mainui, Kernel *kernel)
@@ -59,6 +59,8 @@ void KernelMemory::ModuleInit(Ui::Kernel *mainui, Kernel *kernel)
 
 KernelMemoryRW::KernelMemoryRW()
 {
+	free_init_ = false;
+	maxsize_ = -1;
 	QUiLoader loader;
 	QFile file(":/UI/ui/memory-rw.ui");
 	file.open(QFile::ReadOnly);
@@ -68,6 +70,7 @@ KernelMemoryRW::KernelMemoryRW()
 	setAttribute(Qt::WA_DeleteOnClose);
 
 	connect(memui_, &QWidget::destroyed, this, &QWidget::close);
+	memui_->installEventFilter(this);
 
 	DEFINE_WIDGET(QPushButton*, readMemBtn);
 	connect(readMemBtn, &QPushButton::clicked, this, [&] {
@@ -77,6 +80,10 @@ KernelMemoryRW::KernelMemoryRW()
 		ULONG64 addr = VariantInt64(readAddrEdit->text().toStdString());
 		ULONG size = VariantInt(readSizeEdit->text().toStdString());
 		ULONG pid = VariantInt(pidEdit->text().toStdString(), 10);
+		if (size > PAGE_SIZE * 100) {
+			QMessageBox::warning(this, tr("Warning"), tr("Read size too big, UI maybe no responsible."), QMessageBox::Ok);
+			return;
+		}
 		ViewMemory(pid, addr, size);
 	});
 
@@ -92,11 +99,11 @@ KernelMemoryRW::KernelMemoryRW()
 
 		std::string buf;
 		if (!ArkDrvApi::Memory::MemoryRead(pid, addr, size, buf)) {
-			LabelError(statusLabel, tr("Read Memory error, addr:%1 size:%2").arg(QString::number(addr, 16).toUpper()).arg(size));
+			LabelError(statusLabel, tr("Read Memory error, addr:0x%1 size:0x%2").arg(QString::number(addr, 16).toUpper()).arg(QString::number(size, 16).toUpper()));
 			return;
 		}
 		
-		QString filename = WStrToQ(UNONE::StrFormatW(L"%s_%X_%X", QToWChars(CacheGetProcInfo(pid).name), addr, size));
+		QString filename = WStrToQ(UNONE::StrFormatW(L"%s_%llX_%X", QToWChars(CacheGetProcInfo(pid).name), addr, size));
 		QString dumpmem = QFileDialog::getSaveFileName(this, tr("Save to"), filename, tr("DumpMemory(*)"));
 		if (!dumpmem.isEmpty()) {
 			UNONE::FsWriteFileDataW(dumpmem.toStdWString(), buf) ?
@@ -125,14 +132,32 @@ KernelMemoryRW::KernelMemoryRW()
 	connect(pidEdit, &QLineEdit::textChanged, [&](const QString&) {
 		DEFINE_WIDGET(QLineEdit*, pidEdit);
 		DEFINE_WIDGET(QLabel*, pnameLabel);
+		DEFINE_WIDGET(QLabel*, iconLabel);
 		ULONG pid = VariantInt(pidEdit->text().toStdString(), 10);
-		pnameLabel->setText(CacheGetProcInfo(pid).name);
+		auto &&name = CacheGetProcInfo(pid).name;
+		if (name.isEmpty()) return;
+		pnameLabel->setText(name);
+		auto pixmap = LoadIcon(CacheGetProcInfo(pid).path).pixmap(iconLabel->size()).scaled(iconLabel->size(), Qt::KeepAspectRatio);
+		iconLabel->setScaledContents(true);
+		iconLabel->setPixmap(pixmap);
 	});
+	emit pidEdit->textChanged("4");
 }
 
 KernelMemoryRW::~KernelMemoryRW()
 {
-	free_callback_(free_vars_);
+	if (free_init_) free_callback_(free_vars_);
+}
+
+bool KernelMemoryRW::eventFilter(QObject *obj, QEvent *e)
+{
+	if (e->type() == QEvent::KeyPress) {
+		QKeyEvent *keyevt = dynamic_cast<QKeyEvent*>(e);
+		if (keyevt->matches(QKeySequence::Cancel)) {
+			memui_->close();
+		}
+	}
+	return QWidget::eventFilter(obj, e);
 }
 
 void KernelMemoryRW::ViewMemory(ULONG pid, ULONG64 addr, ULONG size)
@@ -144,14 +169,27 @@ void KernelMemoryRW::ViewMemory(ULONG pid, ULONG64 addr, ULONG size)
 	DEFINE_WIDGET(QLineEdit*, pidEdit);
 	pidEdit->setText(QString::number(pid));
 
-	if (ArkDrvApi::Memory::MemoryRead(pid, addr, size, buf)) {
+	
+	auto minsize = MIN(maxsize_, size);
+	if (ArkDrvApi::Memory::MemoryRead(pid, addr, minsize, buf)) {
 		mem = (char*)buf.c_str();
 		memsize = buf.size();
 		readok = true;
 	}
 
-	auto hexdump = HexDumpMemory(addr, mem, size);
-	auto disasm = DisasmMemory(addr, mem, size);
+	auto hexdump = HexDumpMemory(addr, mem, memsize);
+	if (size > memsize) {
+		auto hexdump2 = HexDumpMemory(addr+size, nullptr, size-memsize);
+		hexdump.append(hexdump2);
+	}
+	bool isx64 = true;
+	if (ArkDrvApi::Memory::IsKernelAddress(addr)) {
+		isx64 = UNONE::OsIs64();
+	} else {
+		EN_VID_PROCESS();
+		isx64 = UNONE::PsIsX64(pid);
+	}
+	auto disasm = DisasmMemory(addr, mem, minsize, isx64 ? 64 : 32);
 
 	DEFINE_WIDGET(QTextEdit*, hexEdit);
 	DEFINE_WIDGET(QTextEdit*, disasmEdit);
@@ -166,12 +204,12 @@ void KernelMemoryRW::ViewMemory(ULONG pid, ULONG64 addr, ULONG size)
 	for (auto info : infos) {
 		if (IN_RANGE(addr, info.base, info.size)) {
 			path = WStrToQ(ParseDriverPath(info.path));
+			regionLabel->setText(path);
 			break;
 		}
 	}
-	regionLabel->setText(path);
-	readok ? LabelSuccess(statusLabel, tr("Read Memory successfully, addr:%1 size:%2").arg(QString::number(addr, 16).toUpper()).arg(size)) :
-		LabelError(statusLabel, tr("Read Memory error, addr:%1 size:%2").arg(QString::number(addr, 16).toUpper()).arg(size));
+	readok ? LabelSuccess(statusLabel, tr("Read Memory successfully, addr:0x%1 size:0x%2").arg(QString::number(addr, 16).toUpper()).arg(QString::number(size, 16).toUpper())) :
+		LabelError(statusLabel, tr("Read Memory error, addr:0x%1 size:0x%2").arg(QString::number(addr, 16).toUpper()).arg(QString::number(size, 16).toUpper()));
 }
 
 void KernelMemoryRW::ViewMemory(ULONG pid, std::string data)

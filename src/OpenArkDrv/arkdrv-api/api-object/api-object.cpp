@@ -15,6 +15,47 @@
 ****************************************************************************/
 #include "api-object.h"
 #ifdef _ARKDRV_
+
+ULONG ObjectTypeIndexByName(WCHAR *object_type_name)
+{
+	ULONG		index = -1;
+	NTSTATUS	status;
+	ULONG		bufsize = PAGE_SIZE;
+	PVOID		buf = ExAllocatePoolWithTag(NonPagedPool, bufsize, 'obte');
+	while ((status = ZwQueryObject(
+		NULL,
+		(OBJECT_INFORMATION_CLASS)3, //ObjectTypesInformation,
+		buf,
+		bufsize,
+		NULL
+	)) == STATUS_INFO_LENGTH_MISMATCH) {
+		ExFreePoolWithTag(buf, 'obte');
+		bufsize *= 2;
+		buf = ExAllocatePoolWithTag(NonPagedPool, bufsize, 'obte');
+	}
+	if (!NT_SUCCESS(status)) {
+		ExFreePoolWithTag(buf, 'obte');
+		return index;
+	}
+	ULONG number_types = *(ULONG *)buf;
+	POBJECT_TYPE_INFORMATION obj_info = (POBJECT_TYPE_INFORMATION)(((PUCHAR)buf) + ALIGN_UP(sizeof(number_types), ULONG_PTR));
+	for (ULONG i = 0; i < number_types; i++) {
+		UNICODE_STRING t_type_name;
+		RtlInitUnicodeString(&t_type_name, object_type_name);
+
+		if (0 == RtlCompareUnicodeString(&t_type_name, &(obj_info->TypeName), TRUE)) {
+			index = i + 2;
+			break;
+		}
+		obj_info = (POBJECT_TYPE_INFORMATION)
+			((PCHAR)(obj_info + 1) + ALIGN_UP(obj_info->TypeName.MaximumLength, ULONG_PTR));
+	}
+	if (buf) {
+		ExFreePoolWithTag(buf, 'obte');
+	}
+	return index;
+}
+
 #else
 
 #undef ALIGN_DOWN_BY
@@ -120,6 +161,7 @@ bool ObjectTypeEnumR3(std::vector<ARK_OBJECT_TYPE_ITEM> &items)
 		obj_info = (POBJECT_TYPE_INFORMATION)
 			((PCHAR)(obj_info + 1) + ALIGN_UP(obj_info->TypeName.MaximumLength, ULONG_PTR));
 	}
+	VirtualFree(buf, bufsize, MEM_RELEASE);
 	return true;
 }
 
@@ -187,14 +229,19 @@ bool GetSessions(std::vector<SESSION_INFOW> &sinfos)
 	typedef void (WINAPI *__WTSFreeMemory)(
 		IN PVOID pMemory
 	);
-	__WTSEnumerateSessionsW pWTSEnumerateSessionsW = (__WTSEnumerateSessionsW)GetProcAddress(GetModuleHandleA("Wtsapi32.dll"), "WTSEnumerateSessionsW");
-	__WTSFreeMemory pWTSFreeMemory = (__WTSFreeMemory)GetProcAddress(GetModuleHandleA("Wtsapi32.dll"), "WTSFreeMemory");
+	HMODULE wts = GetModuleHandleA("Wtsapi32.dll");
+	if (!wts) wts = LoadLibraryA("Wtsapi32.dll");
+	__WTSEnumerateSessionsW pWTSEnumerateSessionsW = (__WTSEnumerateSessionsW)GetProcAddress(wts, "WTSEnumerateSessionsW");
+	__WTSFreeMemory pWTSFreeMemory = (__WTSFreeMemory)GetProcAddress(wts, "WTSFreeMemory");
 	if (!pWTSEnumerateSessionsW || !pWTSFreeMemory) return false;
 
 	DWORD scount = 0;
 	PWTS_SESSION_INFOW sessions = NULL;
 	BOOL ret = pWTSEnumerateSessionsW(WTS_CURRENT_SERVER_HANDLE, 0, 1, &sessions, &scount);
-	if (!ret) return false;
+	if (!ret) {
+		ERR(L"WTSEnumerateSessionsW err:%d", GetLastError());
+		return false;
+	}
 
 	for (int i = 0; i < scount; i++) {
 		SESSION_INFOW info;
@@ -234,7 +281,10 @@ bool ObjectSectionEnumR3(std::vector<ARK_OBJECT_SECTION_ITEM> &items, ULONG sess
 	udirname.MaximumLength = udirname.Length;
 	InitializeObjectAttributes(&oa, &udirname, 0, NULL, NULL);
 	status = pNtOpenDirectoryObject(&dirobj, DIRECTORY_QUERY, &oa);
-	if (!NT_SUCCESS(status)) return false;
+	if (!NT_SUCCESS(status)) {
+		ERR(L"NtOpenDirectoryObject status:%d", status);
+		return false;
+	}
 
 	ULONG context, written;
 	ULONG bufsize = 512;
@@ -244,6 +294,7 @@ bool ObjectSectionEnumR3(std::vector<ARK_OBJECT_SECTION_ITEM> &items, ULONG sess
 	if (!NT_SUCCESS(status)) {
 		CloseHandle(dirobj);
 		free(info);
+		ERR(L"NtQueryDirectoryObject status:%d", status);
 		return false;
 	}
 	while (NT_SUCCESS(pNtQueryDirectoryObject(dirobj, info, bufsize, TRUE, FALSE, &context, &written))) {
@@ -268,8 +319,6 @@ bool ObjectSectionEnumR3(std::vector<ARK_OBJECT_SECTION_ITEM> &items, ULONG sess
 				item.section_size = (ULONG)mbi.RegionSize;
 				UnmapViewOfFile(mapaddr);
 				CloseHandle(maphd);
-			} else {
-				ERR(L"%s %d", map_name.c_str(), GetLastError());
 			}
 			item.session_id = session;
 			items.push_back(item);

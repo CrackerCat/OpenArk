@@ -46,7 +46,7 @@ bool HotkeySortFilterProxyModel::lessThan(const QModelIndex &left, const QModelI
 }
 
 Kernel::Kernel(QWidget *parent, int tabid) :
-	parent_((OpenArk*)parent)
+	CommonMainTabObject::CommonMainTabObject((OpenArk*)parent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);
@@ -87,9 +87,18 @@ bool Kernel::eventFilter(QObject *obj, QEvent *e)
 			menu->move(ctxevt->globalPos());
 			menu->show();
 		}
+	} else if (e->type() == QEvent::MouseMove) {
+		QMouseEvent *mouse = static_cast<QMouseEvent *>(e);
+		if (obj == ui.hkFilterEdit) {
+			if (ui.hkFilterEdit->text().isEmpty()) {
+				QString tips(tr("Tips:If you not found the hotkeys,please check the shortcut keys of IME software.(eg:Microsoft/Sogou/Google IME, etc.)"));
+				QToolTip::showText(mouse->globalPos(), tips);
+				return true;
+			}
+		}
 	}
 
-	if (network_) network_->EventFilter();
+	if (network_) network_->eventFilter(obj, e);
 	if (driver_) driver_->eventFilter(obj, e);
 
 	if (filtered) {
@@ -180,6 +189,7 @@ void Kernel::onOpenFile(QString path)
 
 void Kernel::onTabChanged(int index)
 {
+	if (parent_->GetActiveTab() != TAB_KERNEL) return;
 	switch (index) {
 	case TAB_KERNEL_NOTIFY:
 		ShowSystemNotify();
@@ -193,6 +203,36 @@ void Kernel::onTabChanged(int index)
 	CommonMainTabObject::onTabChanged(index);
 }
 
+std::string OsReleaseNumber()
+{
+	/*
+	//c++11
+	std::map<DWORD, DWORD> tables = {
+		{ 10240, 1507 }, { 10586, 1511} ,{ 14393, 1607 } ,{ 15063, 1703 } ,{ 16299, 1709 } ,{ 17134, 1803 } ,
+		{ 17763, 1809 }, { 18362, 1903 } ,{ 18363, 1909 } ,{ 19041, 2004 }, { 19042, 20H2 }
+	};*/
+
+	std::pair<DWORD, std::string> pairs[] = {
+		std::make_pair(10240, "1507"),
+		std::make_pair(10586, "1511"),
+		std::make_pair(14393, "1607"),
+		std::make_pair(15063, "1703"),
+		std::make_pair(16299, "1709"),
+		std::make_pair(17134, "1803"),
+		std::make_pair(17763, "1809"),
+		std::make_pair(18362, "1903"),
+		std::make_pair(18363, "1909"),
+		std::make_pair(19041, "2004"),
+		std::make_pair(19042, "20H2"),
+	};
+	std::map<DWORD, std::string> tables(pairs, pairs+_countof(pairs));
+
+	DWORD build = UNONE::OsBuildNumber();
+	auto it = tables.find(build);
+	if (it != tables.end())
+		return it->second;
+	return "";
+}
 void Kernel::InitKernelEntryView()
 {
 	kerninfo_model_ = new QStandardItemModel;
@@ -224,7 +264,7 @@ void Kernel::InitKernelEntryView()
 	auto major = UNONE::OsMajorVer();
 	AddSummaryUpItem(tr("MajorVersion"), DWordToDecQ(major));
 	AddSummaryUpItem(tr("MiniorVersion"), DWordToDecQ(UNONE::OsMinorVer()));
-	if (major >= 10) AddSummaryUpItem(tr("ReleaseNumber"), DWordToDecQ(UNONE::OsReleaseNumber()));
+	if (major >= 10) AddSummaryUpItem(tr("ReleaseNumber"), StrToQ(OsReleaseNumber()));
 	AddSummaryUpItem(tr("BuildNumber"), DWordToDecQ(UNONE::OsBuildNumber()));
 	AddSummaryUpItem(tr("MajorServicePack"), DWordToDecQ(info.wServicePackMajor));
 	AddSummaryUpItem(tr("MiniorServicePack"), DWordToDecQ(info.wServicePackMinor));
@@ -238,6 +278,12 @@ void Kernel::InitKernelEntryView()
 	AddSummaryUpItem(tr("SystemRoot"), WStrToQ(UNONE::OsWinDirW()));
 
 	connect(ui.kernelModeBtn, SIGNAL(clicked()), this, SLOT(onClickKernelMode()));
+	connect(ui.kernelInfoView, &QTableView::doubleClicked, [&](QModelIndex idx) {
+		QString &txt = idx.data().toString();
+		if (txt == tr("ReleaseNumber") || txt == tr("BuildNumber")) {
+			ShellOpenUrl("https://docs.microsoft.com/en-us/windows/release-information/");
+		}
+	});
 
 	arkdrv_conn_ = false;
 	auto timer = new QTimer(this);
@@ -248,25 +294,20 @@ void Kernel::InitKernelEntryView()
 
 void Kernel::InitNotifyView()
 {
-	notify_model_ = new QStandardItemModel;
 	QTreeView *view = ui.notifyView;
+	notify_model_ = new QStandardItemModel;
 	proxy_notify_ = new NotifySortFilterProxyModel(view);
-	proxy_notify_->setSourceModel(notify_model_);
-	proxy_notify_->setDynamicSortFilter(true);
-	proxy_notify_->setFilterKeyColumn(1);
-	view->setModel(proxy_notify_);
-	view->selectionModel()->setModel(proxy_notify_);
-	view->header()->setSortIndicator(-1, Qt::AscendingOrder);
-	view->setSortingEnabled(true);
+	std::vector<std::pair<int, QString>> layout = {
+		{ 150, tr("Callback Entry") },
+		{ 100, tr("Type") },
+		{ 360, tr("Path") },
+		{ 230, tr("Description") },
+		{ 120, tr("Version") },
+		{ 160, tr("Company") } };
+	SetDefaultTreeViewStyle(view, notify_model_, proxy_notify_, layout);
 	view->viewport()->installEventFilter(this);
 	view->installEventFilter(this);
-	notify_model_->setHorizontalHeaderLabels(QStringList() << tr("Callback Entry") << tr("Type") << tr("Path") << tr("Description") << tr("Version") << tr("Company"));
-	view->setColumnWidth(NOTIFY.addr, 150);
-	view->setColumnWidth(NOTIFY.type, 100);
-	view->setColumnWidth(NOTIFY.path, 360);
-	view->setColumnWidth(NOTIFY.desc, 230);
-	view->setColumnWidth(NOTIFY.ver, 120);
-	view->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
 	notify_menu_ = new QMenu();
 	notify_menu_->addAction(tr("Refresh"), this, [&] { ShowSystemNotify(); });
 	notify_menu_->addSeparator();
@@ -313,7 +354,7 @@ void Kernel::InitHotkeyView()
 	hotkey_model_ = new QStandardItemModel;
 	proxy_hotkey_ = new HotkeySortFilterProxyModel(view);
 
-	std::pair<int, QString> colum_layout[] = { 
+	static std::vector<std::pair<int, QString>> layout = {
 	{ 150, tr("Name") },
 	{ 100, tr("PID.TID") },
 	{ 180, tr("Hotkey") },
@@ -323,17 +364,19 @@ void Kernel::InitHotkeyView()
 	{ 180, tr("Title") },
 	{ 180, tr("ClassName") },
 	{ 300, tr("Path") },
-	{ 120, tr("Description") } };
-	SetDefaultTreeViewStyle(view, hotkey_model_, proxy_hotkey_, colum_layout, _countof(colum_layout));
+	{ 160, tr("Description") } };
+	SetDefaultTreeViewStyle(view, hotkey_model_, proxy_hotkey_, layout);
 	view->viewport()->installEventFilter(this);
 	view->installEventFilter(this);
+	ui.hkFilterEdit->installEventFilter(this);
+	ui.hkFilterEdit->setMouseTracking(true);
 
 	hotkey_menu_ = new QMenu();
 	hotkey_menu_->addAction(tr("Refresh"), this, [&] { ShowSystemHotkey(); });
 	hotkey_menu_->addSeparator();
 	hotkey_menu_->addAction(tr("Delete Hotkey"), this, [&] {
-		ULONG32 vkid = QHexToDWord(HotkeyItemData(3));
-		auto arr = HotkeyItemData(1).split(".");
+		ULONG32 vkid = QHexToDWord(HotkeyItemData(LAYOUT_INDEX("HotkeyID")));
+		auto arr = HotkeyItemData(LAYOUT_INDEX("PID.TID")).split(".");
 		ULONG32 pid = QDecToDWord(arr[0]);
 		ULONG32 tid = QDecToDWord(arr[1]);
 		HOTKEY_ITEM item;
@@ -352,14 +395,15 @@ void Kernel::InitHotkeyView()
 	hotkey_menu_->addSeparator();
 	hotkey_menu_->addAction(tr("Sendto Scanner"), this, [&] {
 		parent_->SetActiveTab(TAB_SCANNER);
-		emit signalOpen(HotkeyItemData(7));
+		emit signalOpen(HotkeyItemData(LAYOUT_INDEX("Path")));
 	});
 	hotkey_menu_->addAction(tr("Explore File"), this, [&] {
-		ExploreFile(HotkeyItemData(7));
+		ExploreFile(HotkeyItemData(LAYOUT_INDEX("Path")));
 	});
 	hotkey_menu_->addAction(tr("Properties..."), this, [&]() {
-		WinShowProperties(HotkeyItemData(7).toStdWString());
+		WinShowProperties(HotkeyItemData(LAYOUT_INDEX("Path")).toStdWString());
 	});
+	connect(ui.hkFilterEdit, &QLineEdit::textChanged, [&](QString str) { ShowSystemHotkey(); });
 }
 
 void Kernel::ShowSystemNotify()
@@ -426,9 +470,10 @@ void Kernel::ShowSystemHotkey()
 	DISABLE_RECOVER();
 	ClearItemModelData(hotkey_model_, 0);
 
+	auto flt = ui.hkFilterEdit->text();
+
 	std::vector<HOTKEY_ITEM> infos;
 	ArkDrvApi::WinGUI::HotkeyEnumInfo(infos);
-
 	for (auto item : infos) {
 		auto pid = item.pid;
 
@@ -438,16 +483,40 @@ void Kernel::ShowSystemHotkey()
 		auto &&name = UNONE::FsPathToNameW(path);
 		if (name.empty()) name = UNONE::StrToW((char*)item.name);
 		auto info = CacheGetFileBaseInfo(WStrToQ(path));
-		auto name_item = new QStandardItem(LoadIcon(WStrToQ(path)), WStrToQ(name));
-		auto wnd_item = new QStandardItem(WStrToQ(UNONE::StrFormatW(L"0x%X", item.wnd)));
-		auto title_item = new QStandardItem(WStrToQ(UNONE::PsGetWndTextW((HWND)item.wnd)));
-		auto class_item = new QStandardItem(WStrToQ(UNONE::PsGetWndClassNameW((HWND)item.wnd)));
-		auto hk_item = new QStandardItem(WStrToQ(UNONE::StrFormatW(L"0x%p", item.hkobj)));
-		auto ptid_item = new QStandardItem(WStrToQ(UNONE::StrFormatW(L"%d.%d", item.pid, item.tid)));
-		auto vk_item = new QStandardItem(StrToQ(HotkeyVkToString(item.vk, item.mod1, item.mod2)));
-		auto vkid_item = new QStandardItem(WStrToQ(UNONE::StrFormatW(L"0x%X", item.id)));
-		auto path_item = new QStandardItem(WStrToQ(path));
-		auto desc_item = new QStandardItem(info.desc);
+		auto name_str = WStrToQ(name);
+		auto wnd_str = WStrToQ(UNONE::StrFormatW(L"0x%X", item.wnd));
+		auto title_str = WStrToQ(UNONE::PsGetWndTextW((HWND)item.wnd));
+		auto class_str = WStrToQ(UNONE::PsGetWndClassNameW((HWND)item.wnd));
+		auto hk_str = WStrToQ(UNONE::StrFormatW(L"0x%p", item.hkobj));
+		auto ptid_str = WStrToQ(UNONE::StrFormatW(L"%d.%d", item.pid, item.tid));
+		auto vk_str = StrToQ(HotkeyVkToString(item.vk, item.mod1, item.mod2));
+		auto vkid_str = WStrToQ(UNONE::StrFormatW(L"0x%X", item.id));
+		auto path_str = WStrToQ(path);
+		auto desc_str = info.desc;
+		if (!flt.isEmpty()) {
+			if (!name_str.contains(flt, Qt::CaseInsensitive) &&
+				!wnd_str.contains(flt, Qt::CaseInsensitive) &&
+				!title_str.contains(flt, Qt::CaseInsensitive) &&
+				!class_str.contains(flt, Qt::CaseInsensitive) &&
+				!hk_str.contains(flt, Qt::CaseInsensitive) &&
+				!vk_str.contains(flt, Qt::CaseInsensitive) &&
+				!ptid_str.contains(flt, Qt::CaseInsensitive) &&
+				!path_str.contains(flt, Qt::CaseInsensitive) &&
+				!desc_str.contains(flt, Qt::CaseInsensitive)
+				) continue;
+		}
+
+		auto name_item = new QStandardItem(LoadIcon(WStrToQ(path)), name_str);
+		auto wnd_item = new QStandardItem(wnd_str);
+		auto title_item = new QStandardItem(title_str);
+		auto class_item = new QStandardItem(class_str);
+		auto hk_item = new QStandardItem(hk_str);
+		auto ptid_item = new QStandardItem(ptid_str);
+		auto vk_item = new QStandardItem(vk_str);
+		auto vkid_item = new QStandardItem(vkid_str);
+		auto path_item = new QStandardItem(path_str);
+		auto desc_item = new QStandardItem(desc_str);
+
 		auto count = hotkey_model_->rowCount();
 		int i = 0;
 		hotkey_model_->setItem(count, i++, name_item);

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>843</width>
-    <height>633</height>
+    <height>628</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -156,6 +156,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string/>
+       </property>
        <property name="text">
         <string>Unknown...</string>
        </property>
@@ -216,11 +219,23 @@
           <height>0</height>
          </size>
         </property>
+        <property name="font">
+         <font>
+          <family>SimSun</family>
+          <kerning>false</kerning>
+         </font>
+        </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOn</enum>
         </property>
        </widget>
        <widget class="QTextEdit" name="disasmEdit">
+        <property name="font">
+         <font>
+          <family>SimSun</family>
+          <kerning>false</kerning>
+         </font>
+        </property>
         <property name="verticalScrollBarPolicy">
          <enum>Qt::ScrollBarAlwaysOn</enum>
         </property>
@@ -230,7 +245,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_10">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label_9">
        <property name="text">
@@ -277,6 +292,31 @@
       <widget class="QLabel" name="pnameLabel_2">
        <property name="text">
         <string>ProcessName:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="iconLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>16</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>24</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

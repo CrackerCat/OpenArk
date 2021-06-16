@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>920</width>
-    <height>718</height>
+    <width>787</width>
+    <height>486</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,15 +28,33 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabWinReverse">
+     <widget class="QWidget" name="tabWinCommon">
       <attribute name="title">
-       <string>WinReverse</string>
+       <string>WinCommon</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QGroupBox" name="groupBox">
+          <widget class="QGroupBox" name="commonBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -44,14 +62,14 @@
             </size>
            </property>
            <property name="title">
-            <string>Tools</string>
+            <string/>
            </property>
            <widget class="QPushButton" name="procexpBtn">
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>20</y>
-              <width>101</width>
+              <y>10</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -67,8 +85,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>50</y>
-              <width>101</width>
+              <y>40</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -84,8 +102,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>80</y>
-              <width>101</width>
+              <y>70</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -101,8 +119,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>140</y>
-              <width>101</width>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -118,8 +136,8 @@
             <property name="geometry">
              <rect>
               <x>340</x>
-              <y>110</y>
-              <width>101</width>
+              <y>10</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -135,8 +153,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>110</y>
-              <width>101</width>
+              <y>250</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -152,13 +170,13 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>200</y>
-              <width>101</width>
+              <y>160</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>APIMonitor32</string>
+             <string>APIMon32</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -169,8 +187,8 @@
             <property name="geometry">
              <rect>
               <x>340</x>
-              <y>20</y>
-              <width>101</width>
+              <y>130</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -186,8 +204,8 @@
             <property name="geometry">
              <rect>
               <x>340</x>
-              <y>50</y>
-              <width>101</width>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -202,9 +220,9 @@
            <widget class="QPushButton" name="winspyBtn">
             <property name="geometry">
              <rect>
-              <x>450</x>
-              <y>20</y>
-              <width>101</width>
+              <x>340</x>
+              <y>160</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -220,8 +238,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>20</y>
-              <width>101</width>
+              <y>10</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -237,8 +255,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>140</y>
-              <width>101</width>
+              <y>130</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -254,8 +272,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>80</y>
-              <width>101</width>
+              <y>70</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -271,8 +289,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>230</y>
-              <width>101</width>
+              <y>250</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -288,8 +306,8 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>20</y>
-              <width>101</width>
+              <y>10</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -305,8 +323,8 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>50</y>
-              <width>101</width>
+              <y>40</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -322,8 +340,8 @@
             <property name="geometry">
              <rect>
               <x>340</x>
-              <y>80</y>
-              <width>101</width>
+              <y>40</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -339,8 +357,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>50</y>
-              <width>101</width>
+              <y>40</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -356,8 +374,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>110</y>
-              <width>101</width>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -373,8 +391,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>170</y>
-              <width>101</width>
+              <y>160</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -390,13 +408,13 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>260</y>
-              <width>101</width>
+              <y>280</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>OD 52pj</string>
+             <string>OD 52PJ</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -406,9 +424,9 @@
            <widget class="QPushButton" name="hcdBtn">
             <property name="geometry">
              <rect>
-              <x>280</x>
-              <y>140</y>
-              <width>51</width>
+              <x>282</x>
+              <y>130</y>
+              <width>53</width>
               <height>23</height>
              </rect>
             </property>
@@ -424,8 +442,8 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>110</y>
-              <width>101</width>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -441,13 +459,13 @@
             <property name="geometry">
              <rect>
               <x>450</x>
-              <y>110</y>
-              <width>101</width>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>Fiddler 2</string>
+             <string>Fiddler2</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -457,9 +475,9 @@
            <widget class="QPushButton" name="everythingBtn">
             <property name="geometry">
              <rect>
-              <x>450</x>
-              <y>230</y>
-              <width>101</width>
+              <x>560</x>
+              <y>100</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -474,9 +492,9 @@
            <widget class="QPushButton" name="spyxx32Btn">
             <property name="geometry">
              <rect>
-              <x>450</x>
-              <y>50</y>
-              <width>101</width>
+              <x>340</x>
+              <y>220</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -492,8 +510,8 @@
             <property name="geometry">
              <rect>
               <x>560</x>
-              <y>20</y>
-              <width>101</width>
+              <y>10</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -509,8 +527,8 @@
             <property name="geometry">
              <rect>
               <x>560</x>
-              <y>50</y>
-              <width>101</width>
+              <y>40</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -526,8 +544,8 @@
             <property name="geometry">
              <rect>
               <x>560</x>
-              <y>80</y>
-              <width>101</width>
+              <y>70</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -543,8 +561,8 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>140</y>
-              <width>51</width>
+              <y>130</y>
+              <width>53</width>
               <height>23</height>
              </rect>
             </property>
@@ -560,8 +578,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>260</y>
-              <width>101</width>
+              <y>220</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -577,8 +595,8 @@
             <property name="geometry">
              <rect>
               <x>230</x>
-              <y>80</y>
-              <width>101</width>
+              <y>70</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -594,8 +612,8 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>170</y>
-              <width>101</width>
+              <y>130</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -610,9 +628,9 @@
            <widget class="QPushButton" name="radareBtn">
             <property name="geometry">
              <rect>
-              <x>230</x>
-              <y>170</y>
-              <width>101</width>
+              <x>120</x>
+              <y>310</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -628,13 +646,13 @@
             <property name="geometry">
              <rect>
               <x>10</x>
-              <y>230</y>
-              <width>101</width>
+              <y>190</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>APIMonitor64</string>
+             <string>APIMon64</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -645,8 +663,8 @@
             <property name="geometry">
              <rect>
               <x>120</x>
-              <y>200</y>
-              <width>101</width>
+              <y>220</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -661,9 +679,9 @@
            <widget class="QPushButton" name="spyxx64Btn">
             <property name="geometry">
              <rect>
-              <x>450</x>
-              <y>80</y>
-              <width>101</width>
+              <x>340</x>
+              <y>250</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
@@ -679,13 +697,13 @@
             <property name="geometry">
              <rect>
               <x>450</x>
-              <y>170</y>
-              <width>101</width>
+              <y>190</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>Wireshark v1</string>
+             <string>Wireshark1</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -696,13 +714,13 @@
             <property name="geometry">
              <rect>
               <x>450</x>
-              <y>200</y>
-              <width>101</width>
+              <y>220</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>Wireshark v3</string>
+             <string>Wireshark3</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
@@ -713,68 +731,763 @@
             <property name="geometry">
              <rect>
               <x>450</x>
-              <y>140</y>
-              <width>101</width>
+              <y>130</y>
+              <width>105</width>
               <height>23</height>
              </rect>
             </property>
             <property name="text">
-             <string>Fiddler 4</string>
+             <string>Fiddler4</string>
             </property>
             <property name="icon">
              <iconset resource="../res/openark.qrc">
               <normaloff>:/OpenArk/revtools/fiddler.ico</normaloff>:/OpenArk/revtools/fiddler.ico</iconset>
             </property>
            </widget>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetMaximumSize</enum>
-         </property>
-         <item>
-          <widget class="QProgressBar" name="progressBar">
-           <property name="value">
-            <number>24</number>
-           </property>
-           <property name="textVisible">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="toolsfolderBtn">
-           <property name="text">
-            <string>ToolsFolder</string>
-           </property>
+           <widget class="QPushButton" name="ghidraBtn">
+            <property name="geometry">
+             <rect>
+              <x>120</x>
+              <y>190</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Ghidra</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/ghidra.ico</normaloff>:/OpenArk/revtools/ghidra.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="charlesBtn">
+            <property name="geometry">
+             <rect>
+              <x>450</x>
+              <y>160</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Charles</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/charles.ico</normaloff>:/OpenArk/revtools/charles.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="windowBtn">
+            <property name="geometry">
+             <rect>
+              <x>340</x>
+              <y>190</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Window</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/window.ico</normaloff>:/OpenArk/revtools/window.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="diskgeniusBtn">
+            <property name="geometry">
+             <rect>
+              <x>340</x>
+              <y>70</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>DiskGenius</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/diskgenius.ico</normaloff>:/OpenArk/revtools/diskgenius.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="curlBtn">
+            <property name="geometry">
+             <rect>
+              <x>450</x>
+              <y>10</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>cURL</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/curl.ico</normaloff>:/OpenArk/revtools/curl.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="tcpdumpBtn">
+            <property name="geometry">
+             <rect>
+              <x>450</x>
+              <y>70</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:</string>
+            </property>
+            <property name="text">
+             <string>tcpdump</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/default.ico</normaloff>:/OpenArk/revtools/default.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="wkeBtn">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>310</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>WKE</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/wke.ico</normaloff>:/OpenArk/revtools/wke.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pchunternewBtn">
+            <property name="geometry">
+             <rect>
+              <x>10</x>
+              <y>280</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>PCHunter+</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/pchunter.ico</normaloff>:/OpenArk/revtools/pchunter.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="nmapBtn">
+            <property name="geometry">
+             <rect>
+              <x>450</x>
+              <y>40</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">text-align:</string>
+            </property>
+            <property name="text">
+             <string>Nmap</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/nmap.ico</normaloff>:/OpenArk/revtools/nmap.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="winrarBtn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>160</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>WinRAR</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/winrar.ico</normaloff>:/OpenArk/revtools/winrar.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="x7zBtn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>130</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>7-Zip</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/7z.ico</normaloff>:/OpenArk/revtools/7z.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="chrome85Btn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>220</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Chrome85</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/chromesetup.ico</normaloff>:/OpenArk/revtools/chromesetup.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="chrome49Btn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>190</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Chrome49</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/chrome.ico</normaloff>:/OpenArk/revtools/chrome.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="firefoxBtn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>250</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Firefox</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/firefox.ico</normaloff>:/OpenArk/revtools/firefox.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="keygenerBtn">
+            <property name="geometry">
+             <rect>
+              <x>230</x>
+              <y>160</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Keygener</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/keygener.ico</normaloff>:/OpenArk/revtools/keygener.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pygtoolsBtn">
+            <property name="geometry">
+             <rect>
+              <x>230</x>
+              <y>190</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>PYGTools</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/pygtools.ico</normaloff>:/OpenArk/revtools/pygtools.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="cpuzBtn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>280</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>CPU-Z</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/cpuz.ico</normaloff>:/OpenArk/revtools/cpuz.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="aida64Btn">
+            <property name="geometry">
+             <rect>
+              <x>560</x>
+              <y>310</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>AIDA64</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/aida64.ico</normaloff>:/OpenArk/revtools/aida64.ico</iconset>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="poolmonxBtn">
+            <property name="geometry">
+             <rect>
+              <x>230</x>
+              <y>220</y>
+              <width>105</width>
+              <height>23</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>PoolMonX</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../res/openark.qrc">
+              <normaloff>:/OpenArk/revtools/poolmonx.ico</normaloff>:/OpenArk/revtools/poolmonx.ico</iconset>
+            </property>
+           </widget>
           </widget>
          </item>
         </layout>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabWinDevKits">
       <attribute name="title">
-       <string>Placeholder</string>
+       <string>WinDevKits</string>
       </attribute>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>241</width>
-         <height>31</height>
-        </rect>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
        </property>
-       <property name="text">
-        <string>It's a placeholder used for future.</string>
+       <property name="topMargin">
+        <number>0</number>
        </property>
-      </widget>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="devkitsBox">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="title">
+          <string/>
+         </property>
+         <widget class="QPushButton" name="vc2005x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>190</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2005_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="torgitBtn">
+          <property name="geometry">
+           <rect>
+            <x>120</x>
+            <y>40</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>TortoiseGit</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/tortoisegit.ico</normaloff>:/OpenArk/devkits/tortoisegit.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="torsvnBtn">
+          <property name="geometry">
+           <rect>
+            <x>120</x>
+            <y>70</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>TortoiseSVN</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/tortoisesvn.ico</normaloff>:/OpenArk/devkits/tortoisesvn.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="gitBtn">
+          <property name="geometry">
+           <rect>
+            <x>120</x>
+            <y>10</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Git</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/git.ico</normaloff>:/OpenArk/devkits/git.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2008x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>160</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2008_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2010x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>130</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2010_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2012x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>100</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2012_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2013x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>70</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2013_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2015x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>40</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2015_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc1519x86Btn">
+          <property name="geometry">
+           <rect>
+            <x>230</x>
+            <y>10</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_15~19_x86</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc1519x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>10</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_15~19_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2015x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>40</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2015_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2010x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>130</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2010_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2012x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>100</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2012_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2008x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>160</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2008_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2013x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>70</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2013_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="vc2005x64Btn">
+          <property name="geometry">
+           <rect>
+            <x>370</x>
+            <y>190</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>vcredist_2005_x64</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/vcredist.ico</normaloff>:/OpenArk/devkits/vcredist.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="jdkBtn">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>JDK</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/jdk.ico</normaloff>:/OpenArk/devkits/jdk.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="pythonBtn">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Python</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/python.ico</normaloff>:/OpenArk/devkits/python.ico</iconset>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="golangBtn">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>70</y>
+            <width>101</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Golang</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../res/openark.qrc">
+            <normaloff>:/OpenArk/devkits/golang.ico</normaloff>:/OpenArk/devkits/golang.ico</iconset>
+          </property>
+         </widget>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetMaximumSize</enum>
+     </property>
+     <property name="leftMargin">
+      <number>140</number>
+     </property>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>50</number>
+       </property>
+       <property name="textVisible">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="toolsfolderBtn">
+       <property name="text">
+        <string>ToolsFolder</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

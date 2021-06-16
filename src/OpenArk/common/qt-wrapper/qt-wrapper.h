@@ -74,7 +74,6 @@ protected: \
 	bool lessThan(const QModelIndex &left, const QModelIndex &right) const; \
 };
 
-
 #define TR(str) QObject::tr(str)
 #define TRA(str) QObject::tr(str).toStdString().c_str()
 #define TRW(str) QObject::tr(str).toStdWString().c_str()
@@ -82,10 +81,10 @@ protected: \
 #define QToWChars(qstr) qstr.toStdWString().c_str()
 #define QToStr(qstr) qstr.toStdString()
 #define QToWStr(qstr) qstr.toStdWString()
-#define QDecToDWord(qstr) UNONE::StrToDecimalW(qstr.toStdWString());
-#define QHexToDWord(qstr) UNONE::StrToHexW(qstr.toStdWString());
-#define QDecToQWord(qstr) UNONE::StrToDecimal64W(qstr.toStdWString());
-#define QHexToQWord(qstr) UNONE::StrToHex64W(qstr.toStdWString());
+#define QDecToDWord(qstr) UNONE::StrToDecimalW(qstr.toStdWString())
+#define QHexToDWord(qstr) UNONE::StrToHexW(qstr.toStdWString())
+#define QDecToQWord(qstr) UNONE::StrToDecimal64W(qstr.toStdWString())
+#define QHexToQWord(qstr) UNONE::StrToHex64W(qstr.toStdWString())
 #define CharsToQ(chars) QString::fromLocal8Bit(chars)
 #define WCharsToQ(wchars) QString::fromWCharArray(wchars)
 #define StrToQ(str) QString::fromStdString(str)
@@ -209,7 +208,9 @@ void ExpandTreeView(const QModelIndex& index, QTreeView* view);
 void SetDefaultTableViewStyle(QTableView* view, QStandardItemModel* model);
 void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model);
 void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model, QSortFilterProxyModel *proxy, 
-	std::pair<int, QString> colum_layout[], int count);
+	std::vector<std::pair<int, QString>>& layout);
+int GetLayoutIndex(std::vector<std::pair<int, QString>> &layout, QString name);
+#define LAYOUT_INDEX(str) GetLayoutIndex(layout, tr(str))
 void SetLineBgColor(QStandardItemModel *model, int row, const QBrush &abrush);
 void SetLineHidden(QTreeView *view, int row, bool hide);
 
@@ -228,5 +229,7 @@ bool JsonGetValue(const QByteArray &data, const QString &key, QJsonValue &val);
 //
 void ShellOpenUrl(QString url);
 void ShellRun(QString cmdline, QString param);
+void ShellRunCmdExe(QString exe, int show = SW_SHOW);
+void ShellRunCmdDir(QString dir);
 QString PidFormat(DWORD pid);
 QString NameFormat(QString name);

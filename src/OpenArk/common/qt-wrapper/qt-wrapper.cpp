@@ -50,7 +50,9 @@ void OpenArkTabStyle::drawControl(ControlElement element, const QStyleOption *op
 				painter->setPen(0x00868b);
 				QTextOption option;
 				option.setAlignment(Qt::AlignCenter);
-				painter->setFont(QFont("", 11, QFont::Bold));
+				QFont font = QFont("Microsoft YaHei", 11, QFont::Bold);
+				font.setPixelSize(15);
+				painter->setFont(font);
 				painter->drawText(rect, tabopt->text, option);
 				painter->restore();
 			} else {
@@ -66,7 +68,9 @@ void OpenArkTabStyle::drawControl(ControlElement element, const QStyleOption *op
 				painter->save();
 				QTextOption option;
 				option.setAlignment(Qt::AlignCenter);
-				painter->setFont(QFont("", 11));
+				QFont font = QFont("Microsoft YaHei", 11);
+				font.setPixelSize(15);
+				painter->setFont(font);
 				painter->drawText(rect, tabopt->text, option);
 				painter->restore();
 			}
@@ -232,6 +236,7 @@ void SetDefaultTableViewStyle(QTableView* view, QStandardItemModel* model)
 	view->horizontalHeader()->setMinimumSectionSize(100);
 	view->verticalHeader()->setDefaultSectionSize(25);
 	view->selectionModel()->selectedIndexes();
+	view->setEditTriggers(false);
 }
 
 void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model)
@@ -244,7 +249,7 @@ void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model)
 }
 
 void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model, 
-	QSortFilterProxyModel *proxy, std::pair<int, QString> colum_layout[], int count)
+	QSortFilterProxyModel *proxy, std::vector<std::pair<int, QString>>& layout)
 {
 	proxy->setSourceModel(model);
 	proxy->setDynamicSortFilter(true);
@@ -252,16 +257,26 @@ void SetDefaultTreeViewStyle(QTreeView* view, QStandardItemModel* model,
 	view->setModel(proxy);
 	view->selectionModel()->setModel(proxy);
 	view->header()->setSortIndicator(-1, Qt::AscendingOrder);
+	view->header()->setStretchLastSection(false);
 	view->setSortingEnabled(true);
 	view->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	QStringList name_list;
-	for (int i = 0; i < count; i++) {
-		name_list << colum_layout[i].second;
+	for (int i = 0; i < layout.size(); i++) {
+		name_list << layout[i].second;
 	}
 	model->setHorizontalHeaderLabels(name_list);
-	for (int i = 0; i < count; i++) {
-		view->setColumnWidth(i, colum_layout[i].first);
+	for (int i = 0; i < layout.size(); i++) {
+		if (layout[i].first)
+			view->setColumnWidth(i, layout[i].first);
 	}
+}
+
+int GetLayoutIndex(std::vector<std::pair<int, QString>> &layout, QString name)
+{
+	for (int i = 0; i < layout.size(); i++) {
+		if (layout[i].second == name) return i;
+	}
+	return 0;
 }
 
 void SetLineBgColor(QStandardItemModel *model, int row, const QBrush &abrush)
@@ -320,6 +335,18 @@ void ShellOpenUrl(QString url)
 void ShellRun(QString cmdline, QString param)
 {
 	ShellExecuteW(NULL, L"open", cmdline.toStdWString().c_str(), param.toStdWString().c_str(), NULL, SW_SHOW);
+}
+
+void ShellRunCmdExe(QString exe, int show)
+{
+	auto cmdline = "cmd /c " + exe;
+	UNONE::PsCreateProcessW(cmdline.toStdWString(), show);
+}
+
+void ShellRunCmdDir(QString dir)
+{
+	auto cmdline = "cmd /k cd /D" + dir;
+	UNONE::PsCreateProcessW(cmdline.toStdWString());
 }
 
 QString PidFormat(DWORD pid)

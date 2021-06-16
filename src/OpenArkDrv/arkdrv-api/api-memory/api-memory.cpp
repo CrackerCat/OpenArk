@@ -69,11 +69,23 @@ bool MemoryRead(ULONG pid, ULONG64 addr, ULONG size, std::string &readbuf)
 	std::string data;
 	data.resize(size);
 	BOOL ret = ReadProcessMemory(phd, (PVOID)addr, (PVOID)data.data(), (SIZE_T)size, (SIZE_T*)&readlen);
+	if (!ret) {
+		auto err = GetLastError();
+		if (err != ERROR_PARTIAL_COPY) goto err;
+		MEMORY_BASIC_INFORMATION mbi;
+		if (!VirtualQueryEx(phd, (PVOID)addr, &mbi, sizeof(mbi))) goto err;
+		auto exact = (ULONG)mbi.RegionSize - (ULONG)(addr - (ULONG64)mbi.BaseAddress);
+		ret = ReadProcessMemory(phd, (PVOID)addr, (PVOID)data.data(), (SIZE_T)exact, (SIZE_T*)&readlen);
+		if (!ret) goto err;
+	}
 	CloseHandle(phd);
-	if (!ret) return FALSE;
-
+	data.resize(readlen);
 	readbuf = std::move(data);
 	return true;
+err:
+	ERR(L"ReadProcessMemory pid:%d, err:%d", pid, GetLastError());
+	CloseHandle(phd);
+	return false;
 }
 
 bool MemoryWriteR0(ULONG pid, ULONG64 addr, std::string &writebuf)
@@ -105,14 +117,22 @@ bool MemoryWrite(ULONG pid, ULONG64 addr, std::string &writebuf)
 	PVOID buf = (PVOID)writebuf.data();
 	SIZE_T bufsize = (SIZE_T)writebuf.size();
 	DWORD written, oldprotect;
-	VirtualProtectEx(phd, (PVOID)addr, bufsize, PAGE_READWRITE, &oldprotect);
-	BOOL ret = WriteProcessMemory(phd, (PVOID)addr, buf, bufsize, (SIZE_T*)&written);
-	VirtualProtectEx(phd, (PVOID)addr, bufsize, oldprotect, &oldprotect);
-	CloseHandle(phd);
+	BOOL ret = FALSE;
+	ret = VirtualProtectEx(phd, (PVOID)addr, bufsize, PAGE_READWRITE, &oldprotect);
 	if (!ret) {
-		ERR(L"WriteProcessMemory pid:%d, err:%d", pid, GetLastError());
+		ERR(L"VirtualProtectEx pid:%d, err:%d", pid, GetLastError());
+		CloseHandle(phd);
 		return FALSE;
 	}
+	ret = WriteProcessMemory(phd, (PVOID)addr, buf, bufsize, (SIZE_T*)&written);
+	if (!ret) {
+		ERR(L"WriteProcessMemory pid:%d, err:%d", pid, GetLastError());
+		VirtualProtectEx(phd, (PVOID)addr, bufsize, oldprotect, &oldprotect);
+		CloseHandle(phd);
+		return FALSE;
+	}
+	VirtualProtectEx(phd, (PVOID)addr, bufsize, oldprotect, &oldprotect);
+	CloseHandle(phd);
 
 	return true;
 }

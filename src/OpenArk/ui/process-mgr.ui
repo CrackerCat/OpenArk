@@ -45,16 +45,11 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="font">
-       <font>
-        <pointsize>9</pointsize>
-       </font>
-      </property>
       <property name="editTriggers">
        <set>QAbstractItemView::NoEditTriggers</set>
       </property>
       <property name="indentation">
-       <number>20</number>
+       <number>5</number>
       </property>
       <property name="itemsExpandable">
        <bool>true</bool>

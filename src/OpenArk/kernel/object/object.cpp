@@ -42,6 +42,11 @@ KernelObject::~KernelObject()
 
 void KernelObject::onTabChanged(int index)
 {
+	switch (index) {
+	case TAB_KERNEL_OBJECT_TYPES: ShowObjectTypes(); break;
+	case TAB_KERNEL_OBJECT_SECTIONS: ShowObjectSections(); break;
+	default: break;
+	}
 	CommonTabObject::onTabChanged(index);
 }
 
@@ -55,6 +60,12 @@ bool KernelObject::eventFilter(QObject *obj, QEvent *e)
 		if (ctxevt && menu) {
 			menu->move(ctxevt->globalPos());
 			menu->show();
+		}
+	}
+	if (e->type() == QEvent::KeyPress) {
+		QKeyEvent *keyevt = dynamic_cast<QKeyEvent*>(e);
+		if (keyevt->matches(QKeySequence::Refresh)) {
+			ShowObjectTypes();
 		}
 	}
 	return QWidget::eventFilter(obj, e);
@@ -75,7 +86,7 @@ void KernelObject::InitObjectTypesView()
 	QTreeView *view = ui_->objectTypesView;
 	objtypes_model_ = new QStandardItemModel;
 	proxy_objtypes_ = new ObjectTypesSortFilterProxyModel(view);
-	std::pair<int, QString> colum_layout[] = {
+	std::vector<std::pair<int, QString>> layout = {
 		{ 170, tr("TypeObject") },
 		{ 80, tr("TypeIndex") },
 		{ 227, tr("TypeName") },
@@ -83,19 +94,18 @@ void KernelObject::InitObjectTypesView()
 		{ 110, tr("TotalHandlesNum") },
 	};
 
-	SetDefaultTreeViewStyle(view, objtypes_model_, proxy_objtypes_, colum_layout, _countof(colum_layout));
+	SetDefaultTreeViewStyle(view, objtypes_model_, proxy_objtypes_, layout);
 	view->viewport()->installEventFilter(this);
 	view->installEventFilter(this);
 
 	objtypes_menu_ = new QMenu();
 	objtypes_menu_->addAction(tr("Refresh"), this, [&] {
 		ShowObjectTypes();
-	});
+	}, QKeySequence::Refresh);
 	objtypes_menu_->addAction(tr("Copy"), this, [&] {
 		auto view = ui_->objectTypesView;
 		ClipboardCopyData(GetCurItemViewData(view, GetCurViewColumn(view)).toStdString());
 	});
-	ShowObjectTypes();
 }
 
 void KernelObject::InitObjectSectionsView()
@@ -103,15 +113,14 @@ void KernelObject::InitObjectSectionsView()
 	QTreeView *view = ui_->objectSectionsView;
 	objsections_model_ = new QStandardItemModel;
 	proxy_objsections_ = new ObjectSectionsSortFilterProxyModel(view);
-	std::pair<int, QString> colum_layout[] = {
+	std::vector<std::pair<int, QString>> layout = {
 		{ 220, tr("SectionDirectory") },
 		{ 350, tr("SectionName") },
 		{ 90, tr("SectionSize") },
 		{ 80, tr("SessionID") },
 		{ 80, tr("SessionName") },
 	};
-
-	SetDefaultTreeViewStyle(view, objsections_model_, proxy_objsections_, colum_layout, _countof(colum_layout));
+	SetDefaultTreeViewStyle(view, objsections_model_, proxy_objsections_, layout);
 	view->viewport()->installEventFilter(this);
 	view->installEventFilter(this);
 
@@ -140,15 +149,23 @@ void KernelObject::InitObjectSectionsView()
 			prefix = L"";
 			map_name = section_name;
 		}
-		map_hd = OpenFileMappingW(FILE_MAP_READ, FALSE, map_name.c_str());
-		if (map_hd) {
-			map_addr = (ULONG64)MapViewOfFileEx(map_hd, FILE_MAP_READ, 0, 0, size, NULL);
-			if (!map_addr) {
-				CloseHandle(map_hd);
-				return;
-			}
-			map_size = size;
+		map_hd = OpenFileMappingW(FILE_MAP_READ | FILE_MAP_WRITE, FALSE, map_name.c_str());
+		if (!map_hd) {
+			auto msg = UNONE::StrFormatW(L"OpenFileMappingW %s err:%d", map_name.c_str(), GetLastError());
+			ERR(msg.c_str());
+			QMessageBox::critical(NULL, tr("Error"), WStrToQ(msg));
+			return;
 		}
+		map_addr = (ULONG64)MapViewOfFileEx(map_hd, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, NULL);
+		if (!map_addr) map_addr = (ULONG64)MapViewOfFileEx(map_hd, FILE_MAP_READ, 0, 0, 0, NULL);
+		if (!map_addr) {
+			auto msg = UNONE::StrFormatW(L"MapViewOfFileEx %s err:%d", map_name.c_str(), GetLastError());
+			CloseHandle(map_hd);
+			ERR(msg.c_str());
+			QMessageBox::critical(NULL, tr("Error"), WStrToQ(msg));
+			return;
+		}
+		map_size = size;
 	};
 
 	objsections_menu_->addAction(tr("Dump to File"), this, [&] {
@@ -177,12 +194,11 @@ void KernelObject::InitObjectSectionsView()
 			UnmapViewOfFile(addr);
 			CloseHandle(hd);
 		}, vars);
+		memrw->SetMaxSize(map_size);
 		map_size = MIN(map_size, PAGE_SIZE);
 		memrw->ViewMemory(GetCurrentProcessId(), map_addr, map_size);
 		memrw->OpenNewWindow(qobject_cast<QWidget*>(this->parent()), map_addr, map_size);
 	});
-	ShowObjectTypes();
-	ShowObjectSections();
 }
 
 void KernelObject::ShowObjectTypes()

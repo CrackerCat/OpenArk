@@ -24,6 +24,13 @@
 class Ui::Kernel;
 class Kernel;
 
+enum {
+	//TAB_KERNEL_NETWORK_WFP,
+	//TAB_KERNEL_NETWORK_TDI,
+	TAB_KERNEL_NETWORK_PORT,
+	TAB_KERNEL_NETWORK_HOSTS,
+};
+
 typedef struct _CALLOUT_INFO {
 	ULONG CalloutId;
 	GUID CalloutKey;
@@ -33,6 +40,7 @@ typedef struct _CALLOUT_INFO {
 bool EnumWfpCallouts(std::vector<CALLOUT_INFO>& CalloutIDs);
 
 PROXY_FILTER(WfpSortFilterProxyModel);
+PROXY_FILTER(PortSortFilterProxyModel);
 class KernelNetwork : public CommonTabObject {
 	Q_OBJECT
 
@@ -40,19 +48,28 @@ public:
 	KernelNetwork();
 	~KernelNetwork();
 public:
-	bool EventFilter();
+	bool eventFilter(QObject *obj, QEvent *e);
 	void ModuleInit(Ui::Kernel *ui, Kernel *kernel);
 
 private slots:
 	void onTabChanged(int index);
+	void onShowPortInfo();
 
 private:
+	void InitWfpView();
+	void InitHostsView();
+	void InitPortView();
 	void ShowWfpInfo();
 
-
 private:
-	Ui::Kernel *ui;
-	QMenu *wfp_menu_;
+	Ui::Kernel *ui_;
+	Kernel *kernel_;
+	std::wstring hosts_dir_;
+	std::wstring hosts_file_;
+	QMenu *hosts_menu_;
+	QMenu *port_menu_;
 	QStandardItemModel *wfp_model_;
+	QStandardItemModel *port_model_;
 	WfpSortFilterProxyModel *proxy_wfp_;
+	PortSortFilterProxyModel *proxy_port_;
 };

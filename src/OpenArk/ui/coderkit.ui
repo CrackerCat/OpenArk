@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1131</width>
-    <height>797</height>
+    <width>654</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,7 +38,7 @@
       <enum>QTabWidget::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabCodePoints">
       <property name="sizePolicy">
@@ -87,7 +87,6 @@
         <widget class="QLabel" name="label_3">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -107,7 +106,6 @@
         <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -127,7 +125,6 @@
         <widget class="QLabel" name="label_4">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -147,7 +144,6 @@
         <widget class="QLabel" name="label_5">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -167,7 +163,6 @@
         <widget class="QLabel" name="label_6">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -187,7 +182,6 @@
         <widget class="QLabel" name="label_7">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -207,7 +201,6 @@
         <widget class="QLabel" name="label_8">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -227,7 +220,6 @@
         <widget class="QLabel" name="label_9">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -247,7 +239,6 @@
         <widget class="QLabel" name="label_10">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -267,7 +258,6 @@
         <widget class="QLabel" name="label_11">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -287,7 +277,6 @@
         <widget class="QLabel" name="label_12">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -307,7 +296,6 @@
         <widget class="QLabel" name="label_13">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -393,7 +381,6 @@
         <widget class="QLabel" name="label">
          <property name="font">
           <font>
-           <pointsize>10</pointsize>
            <weight>75</weight>
            <bold>true</bold>
           </font>
@@ -555,12 +542,44 @@
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="typeBox">
-              <property name="minimumSize">
-               <size>
-                <width>150</width>
-                <height>30</height>
-               </size>
+             <widget class="QRadioButton" name="base64Radio">
+              <property name="text">
+               <string>Base64</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="crc32Radio">
+              <property name="text">
+               <string>CRC32</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="md5Radio">
+              <property name="text">
+               <string>MD5</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="sha1Radio">
+              <property name="text">
+               <string>SHA1</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="urlencodeRadio">
+              <property name="text">
+               <string>URL-Encode</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="urldecodeRadio">
+              <property name="text">
+               <string>URL-Decode</string>
               </property>
              </widget>
             </item>

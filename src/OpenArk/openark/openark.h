@@ -65,7 +65,8 @@ private slots:
 public:
 	void StatusBarClear();
 	void StatusBarAdd(QWidget *label);
-	void SetActiveTab(int idx);
+	void SetActiveTab(int idx) const { ui.tabWidget->setCurrentIndex(idx); };
+	int GetActiveTab() const { return ui.tabWidget->currentIndex(); };
 
 private:
 	Cmds *cmds_;

@@ -81,7 +81,7 @@ font-size:14px;</string>
      </rect>
     </property>
     <property name="text">
-     <string>Support :Windows XP/7/8/8.1/10 32/64bit</string>
+     <string>Support: Windows XP/7/8/8.1/10 32/64bit</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -90,7 +90,7 @@ font-size:14px;</string>
       <x>40</x>
       <y>190</y>
       <width>451</width>
-      <height>41</height>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
